@@ -1,2 +1,116 @@
-node_modules
-.angular
+########################################
+# OS & OneDrive noise
+########################################
+# Windows / Explorer
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# OneDrive sync leftovers / temp files
+~$*
+*.tmp
+*.temp
+*.lnk
+*.stackdump
+*.log.old
+
+# macOS (in case teammates use mac)
+.DS_Store
+.AppleDouble
+.LSOverride
+
+########################################
+# Editors / IDEs
+########################################
+# VS Code
+.vscode/
+.history/
+
+# JetBrains
+.idea/
+*.iml
+
+# Visual Studio (solution-level)
+.vs/
+*.user
+*.suo
+
+########################################
+# Node / Angular (frontend)
+########################################
+node_modules/
+dist/
+tmp/
+temp/
+.angular/
+.angular/cache/
+.cache/
+
+# Angular build artifacts / coverage
+coverage/
+
+# Env & local config (don’t commit secrets)
+# (Keep environment.ts checked in if it’s the non-secret default;
+# add your sensitive variants here)
+src/environments/*.local.ts
+src/environments/*.dev.local.ts
+src/environments/*.prod.local.ts
+.env
+.env.*
+
+########################################
+# .NET (backend)
+########################################
+# Build outputs
+bin/
+obj/
+out/
+[Bb]uild/
+
+# Common artifacts
+*.log
+*.bak
+*.cache
+*.pdb
+
+# Rider/Resharper, NuGet, etc.
+_ReSharper*/
+*.DotSettings.user
+*.nupkg
+packages/
+.nuget/
+*.snupkg
+
+# ASP.NET Core local settings (keep your non-secret base file)
+appsettings.Development.local.json
+appsettings.Local.json
+appsettings.*.local.json
+
+# IIS / hosting
+.vscode/.browse.VC.db
+.vscode/ipch
+*.dbmdl
+
+########################################
+# Testing / Reports
+########################################
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+.nyc_output/
+karma-*.log
+
+########################################
+# Miscellaneous
+########################################
+*.swp
+*.orig
+*.lock
+*.tmp.*
+*.tgz
+
+# Optional: ignore local SQLite dev DBs if you generate them
+# *.sqlite
+# *.db
