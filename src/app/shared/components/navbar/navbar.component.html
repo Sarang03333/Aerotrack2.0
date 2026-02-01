@@ -1,0 +1,27 @@
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" routerLink="/">AeroTrack</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link" routerLink="/maintenance" routerLinkActive="active">Maintenance</a></li>
+        <li class="nav-item"><a class="nav-link" routerLink="/inventory" routerLinkActive="active">Inventory</a></li>
+        <li class="nav-item"><a class="nav-link" routerLink="/compliance" routerLinkActive="active">Compliance</a></li>
+      </ul>
+
+      <div class="d-flex">
+        <ng-container *ngIf="auth.isAuthenticated(); else loginLink">
+          <span class="navbar-text me-3 small">Roles: {{ auth.roles.join(', ') }}</span>
+          <button class="btn btn-outline-light btn-sm" (click)="logout()">Logout</button>
+        </ng-container>
+        <ng-template #loginLink>
+          <a class="btn btn-outline-light btn-sm" routerLink="/login">Login</a>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</nav>

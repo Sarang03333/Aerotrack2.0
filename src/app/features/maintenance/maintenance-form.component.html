@@ -1,0 +1,59 @@
+<h2>{{mode==='new' ? 'New' : 'Edit'}} Maintenance Task</h2>
+<form [formGroup]="form" (ngSubmit)="save()" class="row g-3">
+
+  <div class="col-md-3">
+    <label class="form-label">Task ID</label>
+    <input class="form-control" formControlName="taskId" [readonly]="mode==='edit'" placeholder="e.g. MT-20260129-0001">
+  </div>
+
+  <div class="col-md-3">
+    <label class="form-label">Aircraft ID</label>
+    <select class="form-select" formControlName="aircraftId">
+      <option value="" disabled>Select Aircraft</option>
+      <option *ngFor="let id of aircraftIds" [value]="id">{{id}}</option>
+    </select>
+  </div>
+
+  <div class="col-md-3">
+    <label class="form-label">Scheduled Date</label>
+    <input type="date" class="form-control" formControlName="scheduledDate">
+  </div>
+
+  <div class="col-md-3">
+    <label class="form-label">Status</label>
+    <select class="form-select" formControlName="status">
+      <option>PENDING</option>
+      <option>IN_PROGRESS</option>
+      <option>COMPLETED</option>
+    </select>
+  </div>
+
+  <div class="col-md-12">
+    <label class="form-label">Description</label>
+    <textarea rows="3" class="form-control" formControlName="description" placeholder="Describe the maintenance task"></textarea>
+  </div>
+
+  <div class="col-md-3">
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" formControlName="isEmergency" id="isEmergency">
+      <label class="form-check-label" for="isEmergency">
+        Mark as Emergency
+      </label>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <label class="form-label">Priority</label>
+    <select class="form-select" formControlName="priority">
+      <option>Emergency</option>
+      <option>High</option>
+      <option>Normal</option>
+      <option>Low</option>
+    </select>
+  </div>
+
+  <div class="col-12">
+    <button class="btn btn-success" type="submit">{{mode==='new'?'Save':'Update'}}</button>
+    <a class="btn btn-secondary ms-2" routerLink="/maintenance">Cancel</a>
+  </div>
+</form>

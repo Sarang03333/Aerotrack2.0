@@ -1,0 +1,27 @@
+<h2 class="mb-3">Dashboard</h2>
+<div class="row">
+  <div class="col-md-3"><app-stat-card label="Aircraft" icon="bi-airplane" [value]="(metrics$|async)?.totalAircraft" subtitle="Total in fleet"></app-stat-card></div>
+  <div class="col-md-3"><app-stat-card label="Open Tasks" icon="bi-wrench" [value]="(metrics$|async)?.openTasks" subtitle="Pending & In-Progress"></app-stat-card></div>
+  <div class="col-md-3"><app-stat-card label="Completed" icon="bi-check-circle" [value]="(metrics$|async)?.completedTasks" subtitle="All time"></app-stat-card></div>
+  <div class="col-md-3"><app-stat-card label="Non-Compliant" icon="bi-exclamation-triangle" [value]="(metrics$|async)?.nonCompliant" subtitle="Requires action"></app-stat-card></div>
+</div>
+<div class="row mt-2 g-3">
+  <div class="col-lg-6">
+    <div class="card"><div class="card-body">
+      <h6 class="mb-3">Maintenance Trend</h6>
+      <canvas baseChart [data]="maintenanceTrendData" chartType="line"></canvas>
+    </div></div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card"><div class="card-body">
+      <h6 class="mb-3">Compliance Status</h6>
+      <canvas baseChart [data]="complianceData" chartType="doughnut"></canvas>
+    </div></div>
+  </div>
+  <div class="col-lg-12">
+    <div class="card"><div class="card-body">
+      <h6 class="mb-3">Inventory Health</h6>
+      <canvas baseChart [data]="inventoryHealthData" chartType="bar"></canvas>
+    </div></div>
+  </div>
+</div>

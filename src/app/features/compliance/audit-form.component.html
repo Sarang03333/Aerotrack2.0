@@ -1,0 +1,41 @@
+<h2>{{mode==='new' ? 'New' : 'Edit'}} Audit</h2>
+<form [formGroup]="form" (ngSubmit)="save()" class="row g-3">
+  <div class="col-md-3">
+    <label class="form-label">Audit ID</label>
+    <input class="form-control" formControlName="auditId" [readonly]="mode==='edit'" placeholder="e.g. AU-20260129-001">
+  </div>
+
+  <div class="col-md-3">
+    <label class="form-label">Aircraft ID</label>
+    <select class="form-select" formControlName="aircraftId">
+      <option value="" disabled>Select Aircraft</option>
+      <option *ngFor="let id of aircraftIds" [value]="id">{{id}}</option>
+    </select>
+  </div>
+
+  <div class="col-md-3">
+    <label class="form-label">Date</label>
+    <input type="date" class="form-control" formControlName="date">
+  </div>
+
+  <div class="col-md-3">
+    <label class="form-label">Severity</label>
+    <select class="form-select" formControlName="severity">
+      <option>None</option>
+      <option>Minor</option>
+      <option>Major</option>
+      <option>Critical</option>
+    </select>
+  </div>
+
+  <div class="col-12">
+    <label class="form-label">Findings</label>
+    <textarea rows="3" class="form-control" formControlName="findings"
+              placeholder='Use "No discrepancies." if all clear'></textarea>
+  </div>
+
+  <div class="col-12">
+    <button class="btn btn-success" type="submit">{{mode==='new'?'Save':'Update'}}</button>
+    <a class="btn btn-secondary ms-2" routerLink="/compliance">Cancel</a>
+  </div>
+</form>

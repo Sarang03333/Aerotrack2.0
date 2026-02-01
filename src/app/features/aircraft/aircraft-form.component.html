@@ -1,0 +1,35 @@
+<h2>{{mode==='new' ? 'Add' : 'Edit'}} Aircraft</h2>
+
+<div class="alert alert-info py-2 mb-2">
+  <strong>Compliance</strong> is <em>auto‑computed</em> from audits:
+  <span class="badge bg-success ms-2" *ngIf="computedStatus==='Compliant'">Compliant</span>
+  <span class="badge bg-warning text-dark ms-2" *ngIf="computedStatus==='Pending'">Pending</span>
+  <span class="badge bg-danger ms-2" *ngIf="computedStatus==='Non-Compliant'">Non‑Compliant</span>
+  <span class="ms-2" *ngIf="!computedStatus">Pending</span>
+</div>
+
+<form [formGroup]="form" (ngSubmit)="save()" class="row g-3">
+  <div class="col-md-4">
+    <label class="form-label">Aircraft ID</label>
+    <input class="form-control" formControlName="aircraftId" [readonly]="mode==='edit'" placeholder="e.g. AC-COM-0001">
+  </div>
+
+  <div class="col-md-4">
+    <label class="form-label">Model</label>
+    <input class="form-control" formControlName="model" placeholder="e.g. Boeing 737-800">
+  </div>
+
+  <div class="col-md-4">
+    <label class="form-label">Category</label>
+    <select class="form-select" formControlName="category">
+      <option>Commercial</option>
+      <option>Defense</option>
+      <option>Cargo</option>
+    </select>
+  </div>
+
+  <div class="col-12">
+    <button class="btn btn-success" type="submit">{{mode==='new'?'Save':'Update'}}</button>
+    <a class="btn btn-secondary ms-2" routerLink="/aircraft">Cancel</a>
+  </div>
+</form>

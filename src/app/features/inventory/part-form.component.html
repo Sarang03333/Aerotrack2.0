@@ -1,0 +1,39 @@
+<h2>{{ mode === "new" ? "Add" : "Edit" }} Part</h2>
+<form [formGroup]="form" (ngSubmit)="save()" class="row g-3">
+  <div class="col-md-4">
+    <label class="form-label">Part ID</label
+    ><input
+    placeholder="e.g. SP-GEN-0001"
+      class="form-control"
+      formControlName="partId"
+      [readonly]="mode === 'edit'"
+    />
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Name</label
+    ><input class="form-control" formControlName="name" />
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Quantity</label
+    ><input
+      type="number"
+      class="form-control"
+      formControlName="quantityAvailable"
+      min="0"
+    />
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Reorder Level</label
+    ><input
+      type="number"
+      class="form-control"
+      formControlName="reorderLevel"
+      min="0"
+    />
+  </div>
+  <div class="col-12">
+    <button class="btn btn-success" type="submit">
+      {{ mode === "new" ? "Save" : "Update" }}</button
+    ><a class="btn btn-secondary ms-2" routerLink="/inventory">Cancel</a>
+  </div>
+</form>

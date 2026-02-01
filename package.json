@@ -1,0 +1,32 @@
+{
+  "name": "aerotrack",
+  "version": "1.4.0",
+  "private": true,
+  "scripts": {
+    "start": "ng serve --force -o",
+    "build": "ng build"
+  },
+  "dependencies": {
+    "@angular/animations": "19.2.18",
+    "@angular/common": "19.2.18",
+    "@angular/compiler": "19.2.18",
+    "@angular/core": "19.2.18",
+    "@angular/forms": "19.2.18",
+    "@angular/platform-browser": "19.2.18",
+    "@angular/platform-browser-dynamic": "19.2.18",
+    "@angular/router": "19.2.18",
+    "bootstrap": "^5.3.3",
+    "bootstrap-icons": "^1.11.3",
+    "chart.js": "^4.4.1",
+    "ng2-charts": "^6.0.1",
+    "rxjs": "^7.8.1",
+    "tslib": "^2.6.2",
+    "zone.js": "~0.15.0"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "19.2.3",
+    "@angular/cli": "19.2.3",
+    "@angular/compiler-cli": "19.2.18",
+    "typescript": "5.8.2"
+  }
+}

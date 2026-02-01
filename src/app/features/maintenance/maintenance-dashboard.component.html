@@ -1,0 +1,12 @@
+<h2 class="mb-3">Maintenance Dashboard</h2>
+<div class="row g-3">
+  <div class="col-lg-4"><div class="card"><div class="card-body"><h6>Status</h6>
+    <canvas baseChart [data]="statusData" chartType="doughnut"></canvas>
+  </div></div></div>
+  <div class="col-lg-8"><div class="card"><div class="card-body"><h6>Tasks per Day (scheduled)</h6>
+    <canvas baseChart [data]="tasksPerDayData" chartType="line"></canvas>
+  </div></div></div>
+  <div class="col-lg-12"><div class="card"><div class="card-body"><h6>Top Aircraft by Tasks</h6>
+    <canvas baseChart [data]="topAircraftData" chartType="bar"></canvas>
+  </div></div></div>
+</div>

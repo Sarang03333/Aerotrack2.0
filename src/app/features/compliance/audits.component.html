@@ -1,0 +1,24 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="mb-0">Compliance & Safety Audits</h2>
+  <div class="d-flex gap-2">
+    <a class="btn btn-sm btn-outline-light" routerLink="/compliance/dashboard"><i class="bi bi-graph-up"></i> Dashboard</a>
+    <a class="btn btn-sm btn-primary" routerLink="/compliance/new">+ New Audit</a>
+  </div>
+</div>
+<div class="table-responsive">
+<table class="table table-striped table-dark table-hover align-middle">
+  <thead><tr><th>Audit ID</th><th>Aircraft</th><th>Date</th><th>Findings</th><th class="text-end">Actions</th></tr></thead>
+  <tbody>
+    <tr *ngFor="let a of (audits$|async)">
+      <td>{{a.auditId}}</td>
+      <td>{{a.aircraftId}}</td>
+      <td>{{a.date | date}}</td>
+      <td>{{a.findings}}</td>
+      <td class="text-end">
+        <a class="btn btn-sm btn-outline-secondary me-2" [routerLink]="['/compliance/edit', a.auditId]">Edit</a>
+        <button class="btn btn-sm btn-outline-danger" (click)="remove(a.auditId)">Delete</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>

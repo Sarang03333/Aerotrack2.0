@@ -1,0 +1,15 @@
+<h2 class="mb-3">Aircraft Dashboard</h2>
+<div class="row g-3">
+  <div class="col-lg-6"><div class="card"><div class="card-body">
+    <h6 class="mb-3">By Category</h6>
+    <canvas baseChart [data]="categoryData" chartType="doughnut"></canvas>
+  </div></div></div>
+  <div class="col-lg-6"><div class="card"><div class="card-body">
+    <h6 class="mb-3">Compliance</h6>
+    <canvas baseChart [data]="complianceData" chartType="pie"></canvas>
+  </div></div></div>
+  <div class="col-lg-12"><div class="card"><div class="card-body">
+    <h6 class="mb-3">Services by Month</h6>
+    <canvas baseChart [data]="servicesByMonthData" chartType="bar"></canvas>
+  </div></div></div>
+</div>

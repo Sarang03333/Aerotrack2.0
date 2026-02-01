@@ -1,0 +1,72 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="mb-0">Maintenance Tasks</h2>
+  <div class="d-flex gap-2">
+    <a class="btn btn-sm btn-outline-light" routerLink="/maintenance/dashboard">
+      <i class="bi bi-graph-up"></i> Dashboard
+    </a>
+    <a class="btn btn-sm btn-primary" routerLink="/maintenance/new">+ New Task</a>
+  </div>
+</div>
+
+<!-- FIX: no arrow function in template -->
+<div class="alert alert-danger d-flex align-items-center" role="alert" *ngIf="hasEmergency$ | async">
+  <i class="bi bi-exclamation-triangle-fill me-2"></i>
+  <div><strong>Emergency Tasks:</strong> action required immediately.</div>
+</div>
+
+<div class="input-group mb-3">
+  <span class="input-group-text">Search</span>
+  <input class="form-control" [(ngModel)]="term" placeholder="Task / Aircraft / Status" />
+</div>
+
+<div class="table-responsive">
+  <table class="table table-striped table-dark table-hover align-middle">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Aircraft</th>
+        <th>Scheduled</th>
+        <th>Status</th>
+        <th>Priority</th>
+        <th>Description</th>
+        <th class="text-end">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let t of (tasks$ | async) | search:term:['taskId','aircraftId','status','description']"
+          [class.table-danger]="t.isEmergency">
+        <td>
+          <span *ngIf="t.isEmergency" class="badge bg-danger me-1">EMERGENCY</span>
+          {{ t.taskId }}
+        </td>
+        <td>{{ t.aircraftId }}</td>
+        <td>{{ t.scheduledDate | date }}</td>
+        <td>
+          <span class="badge"
+                [ngClass]="{
+                  'bg-secondary': t.status === 'PENDING',
+                  'bg-info': t.status === 'IN_PROGRESS',
+                  'bg-success': t.status === 'COMPLETED'
+                }">{{ t.status }}</span>
+        </td>
+        <td>
+          <span class="badge"
+                [ngClass]="{
+                  'bg-danger': t.priority === 'Emergency',
+                  'bg-warning text-dark': t.priority === 'High',
+                  'bg-primary': t.priority === 'Normal',
+                  'bg-light text-dark': t.priority === 'Low'
+                }">{{ t.priority }}</span>
+        </td>
+        <td>{{ t.description }}</td>
+        <td class="text-end">
+          <a class="btn btn-sm btn-outline-secondary me-2" [routerLink]="['/maintenance/edit', t.taskId]">Edit</a>
+          <button class="btn btn-sm btn-outline-success me-2"
+                  (click)="complete(t.taskId)"
+                  [disabled]="t.status === 'COMPLETED'">Done</button>
+          <button class="btn btn-sm btn-outline-danger" (click)="remove(t.taskId)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

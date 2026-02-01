@@ -1,0 +1,11 @@
+body {
+  background: #0f172a;
+  color: #e2e8f0;
+}
+.navbar {
+  background: #0b1220;
+}
+.card {
+  background: #111827;
+  border: 1px solid #1f2937;
+}
