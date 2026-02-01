@@ -1,41 +1,59 @@
-<h2>{{mode==='new' ? 'New' : 'Edit'}} Audit</h2>
-<form [formGroup]="form" (ngSubmit)="save()" class="row g-3">
-  <div class="col-md-3">
-    <label class="form-label">Audit ID</label>
-    <input class="form-control" formControlName="auditId" [readonly]="mode==='edit'" placeholder="e.g. AU-20260129-001">
-  </div>
+<div class="row justify-content-center">
+  <div class="col-md-10 col-lg-8">
+    <div class="form-card fade-in">
 
-  <div class="col-md-3">
-    <label class="form-label">Aircraft ID</label>
-    <select class="form-select" formControlName="aircraftId">
-      <option value="" disabled>Select Aircraft</option>
-      <option *ngFor="let id of aircraftIds" [value]="id">{{id}}</option>
-    </select>
-  </div>
+      <h4 class="text-white fw-bold mb-4">
+        <i class="bi bi-clipboard-check me-2 text-danger"></i>
+        {{ mode === 'new' ? 'New Audit Log' : 'Edit Audit' }}
+      </h4>
 
-  <div class="col-md-3">
-    <label class="form-label">Date</label>
-    <input type="date" class="form-control" formControlName="date">
-  </div>
+      <form [formGroup]="form" (ngSubmit)="save()" class="row g-3">
+        
+        <div class="col-md-6">
+          <label class="form-label">Audit ID</label>
+          <input class="form-control" formControlName="auditId" 
+                 [readonly]="mode==='edit'" 
+                 placeholder="e.g. AU-2026...">
+        </div>
 
-  <div class="col-md-3">
-    <label class="form-label">Severity</label>
-    <select class="form-select" formControlName="severity">
-      <option>None</option>
-      <option>Minor</option>
-      <option>Major</option>
-      <option>Critical</option>
-    </select>
-  </div>
+        <div class="col-md-6">
+          <label class="form-label">Aircraft ID</label>
+          <select class="form-select" formControlName="aircraftId">
+            <option value="" disabled selected>Select Aircraft</option>
+            <option *ngFor="let id of aircraftIds" [value]="id">{{id}}</option>
+          </select>
+        </div>
 
-  <div class="col-12">
-    <label class="form-label">Findings</label>
-    <textarea rows="3" class="form-control" formControlName="findings"
-              placeholder='Use "No discrepancies." if all clear'></textarea>
-  </div>
+        <div class="col-md-6">
+          <label class="form-label">Audit Date</label>
+          <input type="date" class="form-control" formControlName="date">
+        </div>
 
-  <div class="col-12">
-    <button class="btn btn-success" type="submit">{{mode==='new'?'Save':'Update'}}</button>
-    <a class="btn btn-secondary ms-2" routerLink="/compliance">Cancel</a>
+        <div class="col-md-6">
+          <label class="form-label">Severity Level</label>
+          <select class="form-select" formControlName="severity">
+            <option value="None" class="text-success">None (Pass)</option>
+            <option value="Minor" class="text-warning">Minor</option>
+            <option value="Major" class="text-orange">Major</option>
+            <option value="Critical" class="text-danger fw-bold">Critical (Fail)</option>
+          </select>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Findings & Notes</label>
+          <textarea rows="4" class="form-control" formControlName="findings"
+                    placeholder='Describe findings or type "No discrepancies."'></textarea>
+        </div>
+
+        <div class="col-12 mt-4 d-flex justify-content-end gap-2">
+          <a routerLink="/compliance" class="btn btn-outline-secondary">Cancel</a>
+          <button class="btn btn-primary px-4" type="submit" [disabled]="form.invalid">
+            <i class="bi bi-check-circle me-2"></i>{{ mode === 'new' ? 'Submit Audit' : 'Update Audit' }}
+          </button>
+        </div>
+
+      </form>
+
+    </div>
   </div>
-</form>
+</div>

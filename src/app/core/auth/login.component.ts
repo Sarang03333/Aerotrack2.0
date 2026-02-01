@@ -21,18 +21,32 @@ export class LoginComponent {
     remember: [true]
   });
 
-  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {}
+  constructor(
+    private fb: FormBuilder, 
+    private auth: AuthService, 
+    private router: Router
+  ) {}
+
+  // --- RESTORED: Quick Fill Feature ---
+  quickFill(role: string, pass: string) {
+    this.form.patchValue({
+      username: role,
+      password: pass
+    });
+  }
 
   submit() {
     this.error = null;
     if (this.form.invalid) return;
+
     const { username, password } = this.form.getRawValue();
     this.loading = true;
+
     this.auth.login(username!, password!).subscribe({
       next: res => {
         this.auth.saveToken(res.access_token);
         this.loading = false;
-        this.router.navigate(['/']);
+        this.router.navigate(['/dashboard']); 
       },
       error: _ => {
         this.loading = false;

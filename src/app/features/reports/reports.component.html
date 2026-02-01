@@ -1,0 +1,81 @@
+<div class="container-fluid fade-in">
+  
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="text-black text-muted fw-bold mb-0">System Reports</h2>
+      <p class="text-muted mb-0">Combined analytics for Maintenance, Safety, and Costs</p>
+    </div>
+    <button class="btn btn-outline-light btn-sm" (click)="fetchOverview()">
+      <i class="bi bi-arrow-clockwise me-1"></i> Refresh Data
+    </button>
+  </div>
+
+  <div class="row g-3 mb-5" *ngIf="stats">
+    
+    <div class="col-md-4">
+      <div class="stat-card border-start border-4 border-primary">
+        <h6 class="text-secondary text-uppercase small fw-bold mb-2">Total Maintenance Cost</h6>
+        <h2 class="text-white fw-bold mb-0">
+          ${{ stats.totalCost | number:'1.0-0' }}
+        </h2>
+        <small class="text-muted" style="font-size: 0.75rem;">
+          Formula: (Normal × $1.2k) + (Emergency × $5.5k)
+        </small>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="stat-card border-start border-4 border-warning">
+        <h6 class="text-secondary text-uppercase small fw-bold mb-2">Total Fleet Downtime</h6>
+        <h2 class="text-white fw-bold mb-0">
+          {{ stats.totalDowntime }} <span class="fs-6 text-muted fw-normal">Hours</span>
+        </h2>
+        <small class="text-muted" style="font-size: 0.75rem;">
+          Formula: (Normal × 8h) + (Emergency × 24h)
+        </small>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="stat-card border-start border-4" 
+           [ngClass]="{'border-success': stats.safetyScore >= 80, 'border-danger': stats.safetyScore < 80}">
+        <h6 class="text-secondary text-uppercase small fw-bold mb-2">Safety Performance</h6>
+        <h2 class="fw-bold mb-0" 
+            [ngClass]="{'text-success': stats.safetyScore >= 80, 'text-danger': stats.safetyScore < 80}">
+          {{ stats.safetyScore }}%
+        </h2>
+        <small class="text-muted" style="font-size: 0.75rem;">
+          Based on weighted Audit Findings (Critical/Major)
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <h5 class="text-white fw-bold mb-3 border-bottom border-secondary pb-2">Available Reports</h5>
+  
+  <div class="row g-4">
+    <div class="col-md-6 col-lg-5">
+      <div class="card report-action-card h-100 p-4">
+        <div class="d-flex align-items-start">
+          <div class="bg-primary bg-opacity-25 p-3 rounded me-3">
+            <i class="bi bi-file-earmark-bar-graph text-primary fs-3"></i>
+          </div>
+          <div>
+            <h5 class="text-white fw-bold">Combined Module Report</h5>
+            <p class="text-secondary small mb-3">
+              Downloads a comprehensive .CSV file containing specific breakdowns for every aircraft. 
+              Includes individual costs, downtime hours per unit, and compliance risk levels.
+            </p>
+            <button class="btn btn-primary" (click)="downloadCsv()" [disabled]="isGenerating">
+              <span *ngIf="isGenerating" class="spinner-border spinner-border-sm me-2"></span>
+              {{ isGenerating ? 'Generating CSV...' : 'Download Full Report' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+  </div>
+
+</div>

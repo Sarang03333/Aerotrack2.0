@@ -7,7 +7,8 @@ using AeroTrack.Api.Domain.Entities;
 namespace AeroTrack.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")] // /api/compliance
+[Route("api/[controller]")]
+[Authorize]
 public class ComplianceController : ControllerBase
 {
     private readonly AppDbContext _db;

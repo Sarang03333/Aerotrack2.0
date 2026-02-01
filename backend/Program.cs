@@ -54,8 +54,8 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AnyRole", p => p.RequireRole("Admin","Maintenance","InventoryManager","ComplianceOfficer"));
 });
 
-// In-memory users (swap for DB later)
-builder.Services.AddSingleton<IUserService, InMemoryUserService>();
+// We use AddScoped because DbContext is Scoped (created per request)
+builder.Services.AddScoped<IUserService, DbUserService>();
 
 var app = builder.Build();
 

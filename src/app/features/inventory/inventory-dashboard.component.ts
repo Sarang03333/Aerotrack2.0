@@ -1,49 +1,81 @@
 import { Component, OnInit } from '@angular/core';
-import { AsyncPipe } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { BaseChartDirective } from 'ng2-charts';
-import { ChartData } from 'chart.js';
-import { MockDataService } from '../../core/services/mock-data.service';
+import { ChartData, ChartOptions } from 'chart.js';
 
 @Component({
   selector: 'app-inventory-dashboard',
   standalone: true,
-  imports: [ BaseChartDirective],
+  imports: [BaseChartDirective],
   templateUrl: './inventory-dashboard.component.html'
 })
 export class InventoryDashboardComponent implements OnInit {
+  private apiUrl = 'http://localhost:5000/api';
+
+  public darkOptions: ChartOptions = {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { labels: { color: '#e2e8f0' } } },
+    scales: {
+      x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+      y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+    }
+  };
+  public pieOptions: ChartOptions = { ...this.darkOptions, scales: { x: { display: false }, y: { display: false } } };
+
   stockHealthData: ChartData<'doughnut'> = {
-    labels: ['Low', 'OK'],
-    datasets: [{ data: [0, 0], backgroundColor: ['#ef4444', '#22c55e'] }]
+    labels: ['Low Stock', 'Healthy'],
+    datasets: [{ data: [], backgroundColor: ['#ef4444', '#22c55e'], borderColor: '#1e293b' }]
   };
   quantitiesData: ChartData<'bar'> = {
     labels: [],
-    datasets: [{ data: [], backgroundColor: 'rgba(34,197,94,.3)', borderColor: '#22c55e' }]
+    datasets: [{ data: [], label: 'Quantity Available', backgroundColor: '#3b82f6' }]
   };
   reordersData: ChartData<'bar'> = {
     labels: [],
-    datasets: [{ data: [], backgroundColor: 'rgba(248,113,113,.4)', borderColor: '#ef4444' }]
+    datasets: [{ data: [], label: 'Shortage (Units Needed)', backgroundColor: '#f43f5e' }]
   };
 
-  constructor(public data: MockDataService) {}
+  constructor(private http: HttpClient) {}
 
   ngOnInit() {
-    this.data.partList$.subscribe(parts => {
-      let low = 0, ok = 0;
-      parts.forEach(p => (p.quantityAvailable <= p.reorderLevel) ? low++ : ok++);
+    this.http.get<any[]>(`${this.apiUrl}/inventory/parts`).subscribe({
+      next: (parts) => {
+        let low = 0, ok = 0;
+        const lowItems: any[] = [];
+        
+        parts.forEach(p => {
+          if (p.quantityAvailable <= p.reorderLevel) {
+            low++;
+            lowItems.push(p);
+          } else {
+            ok++;
+          }
+        });
+        
+        // 1. Stock Health Pie
+        this.stockHealthData = {
+          ...this.stockHealthData,
+          datasets: [{ ...this.stockHealthData.datasets[0], data: [low, ok] }]
+        };
+        
+        // 2. Quantities (Top 8 by volume)
+        const sortedByQty = [...parts].sort((a, b) => b.quantityAvailable - a.quantityAvailable).slice(0, 8);
+        this.quantitiesData = { 
+          labels: sortedByQty.map(p => p.name), 
+          datasets: [{ ...this.quantitiesData.datasets[0], data: sortedByQty.map(p => p.quantityAvailable) }] 
+        };
 
-      this.stockHealthData = {
-        ...this.stockHealthData,
-        datasets: [{ ...this.stockHealthData.datasets[0], data: [low, ok] }]
-      };
-
-      const labels = parts.map(p => p.name);
-      const qty = parts.map(p => p.quantityAvailable);
-      this.quantitiesData = { labels, datasets: [{ ...this.quantitiesData.datasets[0], data: qty }] };
-
-      const rLabels = parts.filter(p => p.quantityAvailable <= p.reorderLevel).map(p => p.name);
-      const rData = parts.filter(p => p.quantityAvailable <= p.reorderLevel)
-                         .map(p => p.reorderLevel - p.quantityAvailable);
-      this.reordersData = { labels: rLabels, datasets: [{ ...this.reordersData.datasets[0], data: rData }] };
+        // 3. Reorders (Shortage amount)
+        // Shortage = ReorderLevel - Quantity (roughly how much we are "under")
+        this.reordersData = { 
+          labels: lowItems.map(p => p.name), 
+          datasets: [{ 
+            ...this.reordersData.datasets[0], 
+            data: lowItems.map(p => (p.reorderLevel - p.quantityAvailable) + 5) // +5 buffer
+          }] 
+        };
+      },
+      error: (err) => console.error('Failed to load inventory', err)
     });
   }
 }

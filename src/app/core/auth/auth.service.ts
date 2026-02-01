@@ -34,9 +34,12 @@ export class AuthService {
     if (!t) return [];
     try {
       const payload = JSON.parse(atob(t.split('.')[1]));
-      const role = payload['role'];
-      if (!role) return [];
-      return Array.isArray(role) ? role : [role];
+      
+      // FIX: Check both the simple 'role' key and the standard .NET claim URI
+      const roleClaim = payload['role'] || payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+      
+      if (!roleClaim) return [];
+      return Array.isArray(roleClaim) ? roleClaim : [roleClaim];
     } catch { return []; }
   }
 

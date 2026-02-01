@@ -1,39 +1,46 @@
-<h2>{{ mode === "new" ? "Add" : "Edit" }} Part</h2>
-<form [formGroup]="form" (ngSubmit)="save()" class="row g-3">
-  <div class="col-md-4">
-    <label class="form-label">Part ID</label
-    ><input
-    placeholder="e.g. SP-GEN-0001"
-      class="form-control"
-      formControlName="partId"
-      [readonly]="mode === 'edit'"
-    />
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <div class="form-card fade-in">
+
+      <h4 class="text-white fw-bold mb-4">
+        <i class="bi bi-box-seam me-2 text-success"></i>
+        {{ mode === 'new' ? 'Add Inventory Item' : 'Edit Part Details' }}
+      </h4>
+
+      <form [formGroup]="form" (ngSubmit)="save()" class="row g-3">
+        
+        <div class="col-12">
+          <label class="form-label">Part ID</label>
+          <input class="form-control" formControlName="partId" 
+                 [readonly]="mode === 'edit'" 
+                 placeholder="e.g. SP-GEN-0001">
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Part Name</label>
+          <input class="form-control" formControlName="name" 
+                 placeholder="e.g. Turbine Blade Level 1">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Quantity On Hand</label>
+          <input type="number" class="form-control" formControlName="quantityAvailable" min="0">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Reorder Level</label>
+          <input type="number" class="form-control" formControlName="reorderLevel" min="0">
+        </div>
+
+        <div class="col-12 mt-4 d-flex justify-content-end gap-2">
+          <a routerLink="/inventory" class="btn btn-outline-secondary">Cancel</a>
+          <button class="btn btn-primary px-4" type="submit" [disabled]="form.invalid">
+            <i class="bi bi-box-arrow-in-down me-2"></i>{{ mode === 'new' ? 'Add to Stock' : 'Update Item' }}
+          </button>
+        </div>
+
+      </form>
+
+    </div>
   </div>
-  <div class="col-md-4">
-    <label class="form-label">Name</label
-    ><input class="form-control" formControlName="name" />
-  </div>
-  <div class="col-md-2">
-    <label class="form-label">Quantity</label
-    ><input
-      type="number"
-      class="form-control"
-      formControlName="quantityAvailable"
-      min="0"
-    />
-  </div>
-  <div class="col-md-2">
-    <label class="form-label">Reorder Level</label
-    ><input
-      type="number"
-      class="form-control"
-      formControlName="reorderLevel"
-      min="0"
-    />
-  </div>
-  <div class="col-12">
-    <button class="btn btn-success" type="submit">
-      {{ mode === "new" ? "Save" : "Update" }}</button
-    ><a class="btn btn-secondary ms-2" routerLink="/inventory">Cancel</a>
-  </div>
-</form>
+</div>

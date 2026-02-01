@@ -1,17 +1,29 @@
-<h2 class="mb-3">Inventory Dashboard</h2>
+<h4 class="text-white mb-3 fw-bold">Inventory Levels</h4>
 <div class="row g-3">
-  <div class="col-lg-4">
-    <div class="card"><div class="card-body"><h6>Stock Health</h6>
-      <canvas baseChart [data]="stockHealthData" chartType="doughnut"></canvas>
-    </div></div>
+  <div class="col-md-4">
+    <div class="card h-100 shadow-sm border-secondary" style="background-color: #1e293b;">
+      <div class="card-header border-secondary text-white small text-uppercase fw-bold">Stock Health</div>
+      <div class="card-body" style="height: 250px; position: relative;">
+        <canvas baseChart [data]="stockHealthData" type="doughnut" [options]="pieOptions"></canvas>
+      </div>
+    </div>
   </div>
-  <div class="col-lg-8">
-    <div class="card"><div class="card-body"><h6>Quantities</h6>
-      <canvas baseChart [data]="quantitiesData" chartType="bar"></canvas>
-    </div></div>
+
+  <div class="col-md-8">
+    <div class="card h-100 shadow-sm border-secondary" style="background-color: #1e293b;">
+      <div class="card-header border-secondary text-white small text-uppercase fw-bold text-danger">Critical Reorders Needed</div>
+      <div class="card-body" style="height: 250px; position: relative;">
+        <canvas baseChart [data]="reordersData" type="bar" [options]="darkOptions"></canvas>
+      </div>
+    </div>
   </div>
-  <div class="col-lg-12">
-    <div class="card"><div class="card-body"><h6>Reorders Needed</h6>
-      <canvas baseChart [data]="reordersData" chartType="bar"></canvas>
-    </div></div>
+
+  <div class="col-12">
+    <div class="card shadow-sm border-secondary" style="background-color: #1e293b;">
+      <div class="card-header border-secondary text-white small text-uppercase fw-bold">Total Stock (Top Items)</div>
+      <div class="card-body" style="height: 220px; position: relative;">
+        <canvas baseChart [data]="quantitiesData" type="bar" [options]="darkOptions"></canvas>
+      </div>
+    </div>
   </div>
+</div>

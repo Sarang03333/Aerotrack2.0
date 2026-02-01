@@ -7,7 +7,8 @@ using AeroTrack.Api.Domain.Entities;
 namespace AeroTrack.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")] // /api/inventory
+[Route("api/[controller]")]
+[Authorize]
 public class InventoryController : ControllerBase
 {
     private readonly AppDbContext _db;

@@ -1,31 +1,74 @@
-<div class="row justify-content-center mt-5">
-  <div class="col-md-4">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <h4 class="mb-3">Sign in</h4>
-
-        <form [formGroup]="form" (ngSubmit)="submit()">
-          <div class="mb-3">
-            <label class="form-label">Username</label>
-            <input class="form-control" formControlName="username" placeholder="admin | maint | inv | comp">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Password</label>
-            <input type="password" class="form-control" formControlName="password" placeholder="P@ssw0rd!">
-          </div>
-
-          <div class="form-check mb-3">
-            <input type="checkbox" class="form-check-input" formControlName="remember" id="remember">
-            <label class="form-check-label" for="remember">Remember me</label>
-          </div>
-
-          <button class="btn btn-primary w-100" [disabled]="loading" type="submit">
-            {{ loading ? 'Signing in…' : 'Sign in' }}
-          </button>
-        </form>
-
-        <div *ngIf="error" class="alert alert-danger mt-3">{{ error }}</div>
-      </div>
+<div class="login-page">
+  <div class="login-card">
+    
+    <div class="mb-4 text-center">
+      <h1 class="brand-logo"><i class="bi bi-airplane-engines me-2"></i>AeroTrack</h1>
+      <p class="text-secondary small mb-0">Aviation Maintenance & Compliance</p>
     </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      
+      <div class="form-floating mb-3">
+        <input 
+          type="text" 
+          class="form-control" 
+          id="usernameInput" 
+          formControlName="username" 
+          placeholder="Username">
+        <label for="usernameInput">Username</label>
+      </div>
+
+      <div class="form-floating mb-4">
+        <input 
+          type="password" 
+          class="form-control" 
+          id="passwordInput" 
+          formControlName="password" 
+          placeholder="Password">
+        <label for="passwordInput">Password</label>
+      </div>
+
+      <div class="form-check mb-4">
+        <input class="form-check-input" type="checkbox" formControlName="remember" id="rememberMe">
+        <label class="form-check-label text-secondary small" for="rememberMe">
+          Keep me signed in
+        </label>
+      </div>
+
+      <button class="btn btn-primary w-100 py-2 fw-bold shadow-lg" [disabled]="loading || form.invalid" type="submit">
+        <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+        {{ loading ? 'Authenticating...' : 'Sign In' }}
+      </button>
+
+      <div *ngIf="error" class="alert alert-danger d-flex align-items-center small py-2 mt-3" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ error }}
+      </div>
+
+      <div class="border-top border-secondary border-opacity-25 pt-3 mt-4">
+        <small class="text-muted d-block text-center text-uppercase" style="font-size: 0.7rem; letter-spacing: 1px;">
+          Select a Role to Login
+        </small>
+        
+        <div class="role-grid">
+          <div class="role-btn" (click)="quickFill('admin', 'P@ssw0rd!')">
+            <h6>Admin</h6>
+            <small>admin</small>
+          </div>
+          <div class="role-btn" (click)="quickFill('maint', 'P@ssw0rd!')">
+            <h6>Technician</h6>
+            <small>maint</small>
+          </div>
+          <div class="role-btn" (click)="quickFill('inv', 'P@ssw0rd!')">
+            <h6>Inventory</h6>
+            <small>inv</small>
+          </div>
+          <div class="role-btn" (click)="quickFill('comp', 'P@ssw0rd!')">
+            <h6>Compliance</h6>
+            <small>comp</small>
+          </div>
+        </div>
+      </div>
+
+    </form>
   </div>
 </div>

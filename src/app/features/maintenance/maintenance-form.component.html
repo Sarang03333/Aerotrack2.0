@@ -1,59 +1,85 @@
-<h2>{{mode==='new' ? 'New' : 'Edit'}} Maintenance Task</h2>
-<form [formGroup]="form" (ngSubmit)="save()" class="row g-3">
+<div class="row justify-content-center">
+  <div class="col-md-10 col-lg-9">
+    <div class="form-card fade-in">
 
-  <div class="col-md-3">
-    <label class="form-label">Task ID</label>
-    <input class="form-control" formControlName="taskId" [readonly]="mode==='edit'" placeholder="e.g. MT-20260129-0001">
-  </div>
+      <h4 class="text-white fw-bold mb-4">
+        <i class="bi bi-tools me-2 text-warning"></i>
+        {{ mode === 'new' ? 'Schedule Maintenance' : 'Edit Task' }}
+      </h4>
 
-  <div class="col-md-3">
-    <label class="form-label">Aircraft ID</label>
-    <select class="form-select" formControlName="aircraftId">
-      <option value="" disabled>Select Aircraft</option>
-      <option *ngFor="let id of aircraftIds" [value]="id">{{id}}</option>
-    </select>
-  </div>
+      <form [formGroup]="form" (ngSubmit)="save()" class="row g-3">
 
-  <div class="col-md-3">
-    <label class="form-label">Scheduled Date</label>
-    <input type="date" class="form-control" formControlName="scheduledDate">
-  </div>
+        <div class="col-md-6">
+          <label class="form-label">Task ID</label>
+          <input class="form-control" formControlName="taskId" 
+                 [readonly]="mode==='edit'" 
+                 placeholder="Auto-generated or e.g. MT-2026...">
+        </div>
 
-  <div class="col-md-3">
-    <label class="form-label">Status</label>
-    <select class="form-select" formControlName="status">
-      <option>PENDING</option>
-      <option>IN_PROGRESS</option>
-      <option>COMPLETED</option>
-    </select>
-  </div>
+        <div class="col-md-6">
+          <label class="form-label">Target Aircraft</label>
+          <select class="form-select" formControlName="aircraftId">
+            <option value="" disabled selected>Select Aircraft</option>
+            <option *ngFor="let id of aircraftIds" [value]="id">{{id}}</option>
+          </select>
+        </div>
 
-  <div class="col-md-12">
-    <label class="form-label">Description</label>
-    <textarea rows="3" class="form-control" formControlName="description" placeholder="Describe the maintenance task"></textarea>
-  </div>
+        <div class="col-md-6">
+          <label class="form-label">Scheduled Date</label>
+          <input type="date" class="form-control" formControlName="scheduledDate">
+        </div>
 
-  <div class="col-md-3">
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" formControlName="isEmergency" id="isEmergency">
-      <label class="form-check-label" for="isEmergency">
-        Mark as Emergency
-      </label>
+        <div class="col-md-6">
+          <label class="form-label">Current Status</label>
+          <select class="form-select" formControlName="status">
+            <option value="PENDING">Pending</option>
+            <option value="IN_PROGRESS">In Progress</option>
+            <option value="COMPLETED">Completed</option>
+          </select>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Task Description</label>
+          <textarea rows="3" class="form-control" formControlName="description" 
+                    placeholder="Describe the maintenance required..."></textarea>
+        </div>
+
+        <div class="col-12">
+          <div class="p-3 border border-secondary rounded bg-dark bg-opacity-25">
+            <div class="row align-items-center">
+              
+              <div class="col-md-6">
+                <label class="form-label mb-1">Priority Level</label>
+                <select class="form-select" formControlName="priority">
+                  <option value="Low">Low</option>
+                  <option value="Normal">Normal</option>
+                  <option value="High">High</option>
+                  <option value="Emergency" class="text-danger fw-bold">Emergency</option>
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-check form-switch mt-4">
+                  <input class="form-check-input bg-danger border-danger" type="checkbox" formControlName="isEmergency" id="isEmergency">
+                  <label class="form-check-label text-white fw-bold" for="isEmergency">
+                    Mark as Emergency Event
+                  </label>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 mt-4 d-flex justify-content-end gap-2">
+          <a routerLink="/maintenance" class="btn btn-outline-secondary">Cancel</a>
+          <button class="btn btn-primary px-4" type="submit" [disabled]="form.invalid">
+            <i class="bi bi-calendar-check me-2"></i>{{ mode === 'new' ? 'Schedule Task' : 'Update Task' }}
+          </button>
+        </div>
+
+      </form>
+
     </div>
   </div>
-
-  <div class="col-md-3">
-    <label class="form-label">Priority</label>
-    <select class="form-select" formControlName="priority">
-      <option>Emergency</option>
-      <option>High</option>
-      <option>Normal</option>
-      <option>Low</option>
-    </select>
-  </div>
-
-  <div class="col-12">
-    <button class="btn btn-success" type="submit">{{mode==='new'?'Save':'Update'}}</button>
-    <a class="btn btn-secondary ms-2" routerLink="/maintenance">Cancel</a>
-  </div>
-</form>
+</div>

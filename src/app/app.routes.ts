@@ -1,4 +1,8 @@
 import { Routes } from '@angular/router';
+import { LoginComponent } from './core/auth/login.component';
+import { roleGuard } from './core/auth/role.guard'; // Ensure path is correct
+
+// Feature Components
 import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { ListAircraftComponent } from './features/aircraft/list-aircraft.component';
 import { AircraftDashboardComponent } from './features/aircraft/aircraft-dashboard.component';
@@ -12,32 +16,121 @@ import { PartFormComponent } from './features/inventory/part-form.component';
 import { AuditsComponent } from './features/compliance/audits.component';
 import { ComplianceDashboardComponent } from './features/compliance/compliance-dashboard.component';
 import { AuditFormComponent } from './features/compliance/audit-form.component';
-import { ReportsComponent } from './addons/reports/reports.component';
+import { ReportsComponent } from './features/reports/reports.component';
+
+
+
 
 export const routes: Routes = [
-  { path:'', pathMatch:'full', redirectTo:'dashboard' },
-  { path:'dashboard', component: DashboardComponent },
+  // 1. Default -> Login
+  { path: '', pathMatch: 'full', redirectTo: 'login' },
+  
+  // 2. Public Login
+  { path: 'login', component: LoginComponent },
 
-  { path:'aircraft', component: ListAircraftComponent },
-  { path:'aircraft/dashboard', component: AircraftDashboardComponent },
-  { path:'aircraft/new', component: AircraftFormComponent },
-  { path:'aircraft/edit/:id', component: AircraftFormComponent },
+  // 3. Protected Dashboard (Any authenticated role)
+  { 
+    path: 'dashboard', 
+    component: DashboardComponent,
+    canActivate: [roleGuard(['Maintenance', 'InventoryManager', 'ComplianceOfficer'])] 
+  },
 
-  { path:'maintenance', component: ListMaintenanceComponent },
-  { path:'maintenance/dashboard', component: MaintenanceDashboardComponent },
-  { path:'maintenance/new', component: MaintenanceFormComponent },
-  { path:'maintenance/edit/:id', component: MaintenanceFormComponent },
+  // --- AIRCRAFT (Admin or Maintenance) ---
+  { 
+    path: 'aircraft', 
+    component: ListAircraftComponent,
+    canActivate: [roleGuard(['Maintenance'])]
+  },
+  { 
+    path: 'aircraft/dashboard', 
+    component: AircraftDashboardComponent,
+    canActivate: [roleGuard(['Maintenance'])]
+  },
+  { 
+    path: 'aircraft/new', 
+    component: AircraftFormComponent,
+    canActivate: [roleGuard(['Maintenance'])]
+  },
+  { 
+    path: 'aircraft/edit/:id', 
+    component: AircraftFormComponent,
+    canActivate: [roleGuard(['Maintenance'])]
+  },
 
-  { path:'inventory', component: ListPartsComponent },
-  { path:'inventory/dashboard', component: InventoryDashboardComponent },
-  { path:'inventory/new', component: PartFormComponent },
-  { path:'inventory/edit/:id', component: PartFormComponent },
+  // --- MAINTENANCE (Admin or Maintenance) ---
+  { 
+    path: 'maintenance', 
+    component: ListMaintenanceComponent,
+    canActivate: [roleGuard(['Maintenance'])]
+  },
+  { 
+    path: 'maintenance/dashboard', 
+    component: MaintenanceDashboardComponent,
+    canActivate: [roleGuard(['Maintenance'])]
+  },
+  { 
+    path: 'maintenance/new', 
+    component: MaintenanceFormComponent,
+    canActivate: [roleGuard(['Maintenance'])]
+  },
+  { 
+    path: 'maintenance/edit/:id', 
+    component: MaintenanceFormComponent,
+    canActivate: [roleGuard(['Maintenance'])]
+  },
 
-  { path:'compliance', component: AuditsComponent },
-  { path:'compliance/dashboard', component: ComplianceDashboardComponent },
-  { path:'compliance/new', component: AuditFormComponent },
-  { path:'compliance/edit/:id', component: AuditFormComponent },
+  // --- INVENTORY (Admin or InventoryManager) ---
+  { 
+    path: 'inventory', 
+    component: ListPartsComponent,
+    canActivate: [roleGuard(['InventoryManager'])]
+  },
+  { 
+    path: 'inventory/dashboard', 
+    component: InventoryDashboardComponent,
+    canActivate: [roleGuard(['InventoryManager'])]
+  },
+  { 
+    path: 'inventory/new', 
+    component: PartFormComponent,
+    canActivate: [roleGuard(['InventoryManager'])]
+  },
+  { 
+    path: 'inventory/edit/:id', 
+    component: PartFormComponent,
+    canActivate: [roleGuard(['InventoryManager'])]
+  },
 
-  { path:'reports', component: ReportsComponent },
-  { path:'**', redirectTo:'dashboard' }
+  // --- COMPLIANCE (Admin or ComplianceOfficer) ---
+  { 
+    path: 'compliance', 
+    component: AuditsComponent,
+    canActivate: [roleGuard(['ComplianceOfficer'])]
+  },
+  { 
+    path: 'compliance/dashboard', 
+    component: ComplianceDashboardComponent,
+    canActivate: [roleGuard(['ComplianceOfficer'])]
+  },
+  { 
+    path: 'compliance/new', 
+    component: AuditFormComponent,
+    canActivate: [roleGuard(['ComplianceOfficer'])]
+  },
+  { 
+    path: 'compliance/edit/:id', 
+    component: AuditFormComponent,
+    canActivate: [roleGuard(['ComplianceOfficer'])]
+  },
+
+  // --- REPORTS ---
+  { 
+        path: 'reports', 
+        component:ReportsComponent,
+        canActivate: [roleGuard(['Admin', 'Maintenance', 'ComplianceOfficer'])],
+        data: { roles: ['Admin', 'Maintenance', 'ComplianceOfficer'] } // Adjust roles as needed
+    },
+
+  // Fallback
+  { path: '**', redirectTo: 'dashboard' }
 ];

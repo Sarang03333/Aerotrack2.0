@@ -1,11 +1,89 @@
-body {
-  background: #0f172a;
-  color: #e2e8f0;
+/* --- DEEP SPACE AESTHETIC --- */
+html, body {
+  height: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow-x: hidden; /* Prevents horizontal scrollbar */
+  width: 100vw;
 }
-.navbar {
-  background: #0b1220;
+:host {
+  display: block;
+  min-height: 100vh;
+  /* Rich Background Gradient instead of Gray */
+  background: radial-gradient(circle at top right, #1e1b4b, #0f172a 40%, #020617);
+  color: #f8fafc;
+  font-family: 'Exo 2', sans-serif;
+  padding-bottom: 3rem;
 }
-.card {
-  background: #111827;
-  border: 1px solid #1f2937;
+
+/* --- GLASS CARDS --- */
+.glass-card {
+  background: rgba(255, 255, 255, 0.03); /* Extremely subtle fill */
+  backdrop-filter: blur(16px);           /* Heavy Blur */
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08); /* Faint white border */
+  border-radius: 20px;                   /* Extra rounded for modern look */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s;
+  overflow: hidden;
+}
+
+.glass-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* --- VIBRANT STAT CARDS (No more gray!) --- */
+.stat-card-visual {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Dynamic gradients for each stat type */
+.stat-visual-blue { background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), transparent); border-left: 4px solid #3b82f6; }
+.stat-visual-purple { background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), transparent); border-left: 4px solid #8b5cf6; }
+.stat-visual-green { background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), transparent); border-left: 4px solid #22c55e; }
+.stat-visual-orange { background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), transparent); border-left: 4px solid #f59e0b; }
+
+/* Glowing Icons behind text */
+.bg-icon-glow {
+  position: absolute;
+  right: -10px;
+  bottom: -20px;
+  font-size: 6rem;
+  opacity: 0.08;
+  transform: rotate(-15deg);
+  z-index: -1;
+  transition: transform 0.5s ease;
+}
+
+.glass-card:hover .bg-icon-glow {
+  transform: rotate(0deg) scale(1.1);
+  opacity: 0.15;
+}
+
+/* --- TYPOGRAPHY --- */
+h2, h6 {
+  letter-spacing: 0.5px;
+}
+
+.text-glow {
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.chart-container {
+  position: relative;
+  height: 280px; /* Spacious height for charts */
+  width: 100%;
+  padding: 1rem;
+}
+
+/* --- BADGES --- */
+.live-badge {
+  background: rgba(6, 182, 212, 0.15);
+  color: #22d3ee;
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
 }

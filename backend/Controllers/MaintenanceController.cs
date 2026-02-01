@@ -7,7 +7,8 @@ using AeroTrack.Api.Domain.Entities;
 namespace AeroTrack.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")] // /api/maintenance
+[Route("api/[controller]")]
+[Authorize]
 public class MaintenanceController : ControllerBase
 {
     private readonly AppDbContext _db;

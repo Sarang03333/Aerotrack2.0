@@ -1,27 +1,148 @@
-<h2 class="mb-3">Dashboard</h2>
-<div class="row">
-  <div class="col-md-3"><app-stat-card label="Aircraft" icon="bi-airplane" [value]="(metrics$|async)?.totalAircraft" subtitle="Total in fleet"></app-stat-card></div>
-  <div class="col-md-3"><app-stat-card label="Open Tasks" icon="bi-wrench" [value]="(metrics$|async)?.openTasks" subtitle="Pending & In-Progress"></app-stat-card></div>
-  <div class="col-md-3"><app-stat-card label="Completed" icon="bi-check-circle" [value]="(metrics$|async)?.completedTasks" subtitle="All time"></app-stat-card></div>
-  <div class="col-md-3"><app-stat-card label="Non-Compliant" icon="bi-exclamation-triangle" [value]="(metrics$|async)?.nonCompliant" subtitle="Requires action"></app-stat-card></div>
-</div>
-<div class="row mt-2 g-3">
-  <div class="col-lg-6">
-    <div class="card"><div class="card-body">
-      <h6 class="mb-3">Maintenance Trend</h6>
-      <canvas baseChart [data]="maintenanceTrendData" chartType="line"></canvas>
-    </div></div>
+<div class="container-fluid fade-in">
+  
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="text-black text-muted fw-bold mb-0 text-uppercase tracking-wider">Command Center</h2>
+      <p class="text-muted small mb-0">Real-time Fleet Telemetry & Logistics</p>
+    </div>
+    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary px-3 py-2 rounded-pill">
+      <span class="spinner-grow spinner-grow-sm me-2" role="status" aria-hidden="true"></span>
+      LIVE SYSTEM DATA
+    </span>
   </div>
-  <div class="col-lg-6">
-    <div class="card"><div class="card-body">
-      <h6 class="mb-3">Compliance Status</h6>
-      <canvas baseChart [data]="complianceData" chartType="doughnut"></canvas>
-    </div></div>
+
+  <div class="row g-4 mb-4">
+    
+    <div class="col-md-3">
+      <div class="card h-100 p-3 border-0 position-relative overflow-hidden group-hover">
+        <div class="d-flex justify-content-between align-items-start z-1">
+          <div>
+            <h6 class="text-muted text-uppercase small fw-bold tracking-wide mb-2">Total Fleet</h6>
+            <h2 class="text-white fw-bold display-6 mb-0">{{ metrics.totalAircraft }}</h2>
+            <small class="text-secondary small mt-1 d-block">Registered Units</small>
+          </div>
+          <div class="bg-primary bg-opacity-10 p-3 rounded-3 text-primary shadow-sm">
+            <i class="bi bi-airplane fs-3"></i>
+          </div>
+        </div>
+        <i class="bi bi-airplane position-absolute bottom-0 end-0 text-primary opacity-10" 
+           style="font-size: 6rem; transform: translate(20%, 20%) rotate(-15deg);"></i>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card h-100 p-3 border-0 position-relative overflow-hidden group-hover">
+        <div class="d-flex justify-content-between align-items-start z-1">
+          <div>
+            <h6 class="text-muted text-uppercase small fw-bold tracking-wide mb-2">Active Tasks</h6>
+            <h2 class="text-white fw-bold display-6 mb-0">{{ metrics.openTasks }}</h2>
+            <small class="text-info small mt-1 d-block">
+              <i class="bi bi-activity me-1"></i> In Progress
+            </small>
+          </div>
+          <div class="bg-info bg-opacity-10 p-3 rounded-3 text-info shadow-sm">
+            <i class="bi bi-tools fs-3"></i>
+          </div>
+        </div>
+        <i class="bi bi-tools position-absolute bottom-0 end-0 text-info opacity-10" 
+           style="font-size: 6rem; transform: translate(20%, 20%);"></i>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card h-100 p-3 border-0 position-relative overflow-hidden group-hover">
+        <div class="d-flex justify-content-between align-items-start z-1">
+          <div>
+            <h6 class="text-muted text-uppercase small fw-bold tracking-wide mb-2">Completed</h6>
+            <h2 class="text-white fw-bold display-6 mb-0">{{ metrics.completedTasks }}</h2>
+            <small class="text-success small mt-1 d-block">
+              <i class="bi bi-check-lg me-1"></i> All Time
+            </small>
+          </div>
+          <div class="bg-success bg-opacity-10 p-3 rounded-3 text-success shadow-sm">
+            <i class="bi bi-clipboard-check fs-3"></i>
+          </div>
+        </div>
+        <i class="bi bi-clipboard-check position-absolute bottom-0 end-0 text-success opacity-10" 
+           style="font-size: 6rem; transform: translate(20%, 20%);"></i>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card h-100 p-3 border-0 position-relative overflow-hidden group-hover"
+           [ngClass]="{'border-danger border-start border-3': metrics.nonCompliant > 0}">
+        <div class="d-flex justify-content-between align-items-start z-1">
+          <div>
+            <h6 class="text-muted text-uppercase small fw-bold tracking-wide mb-2">Compliance Alert</h6>
+            <h2 class="fw-bold display-6 mb-0" [class.text-danger]="metrics.nonCompliant > 0" [class.text-white]="metrics.nonCompliant === 0">
+              {{ metrics.nonCompliant }}
+            </h2>
+            <small class="text-danger small mt-1 d-block" *ngIf="metrics.nonCompliant > 0">
+              <i class="bi bi-exclamation-octagon me-1"></i> Action Required
+            </small>
+            <small class="text-success small mt-1 d-block" *ngIf="metrics.nonCompliant === 0">
+              <i class="bi bi-shield-check me-1"></i> System Secure
+            </small>
+          </div>
+          <div class="bg-danger bg-opacity-10 p-3 rounded-3 text-danger shadow-sm">
+            <i class="bi bi-shield-exclamation fs-3"></i>
+          </div>
+        </div>
+        <i class="bi bi-shield-exclamation position-absolute bottom-0 end-0 text-danger opacity-10" 
+           style="font-size: 6rem; transform: translate(20%, 20%);"></i>
+      </div>
+    </div>
   </div>
-  <div class="col-lg-12">
-    <div class="card"><div class="card-body">
-      <h6 class="mb-3">Inventory Health</h6>
-      <canvas baseChart [data]="inventoryHealthData" chartType="bar"></canvas>
-    </div></div>
+
+  <div class="row g-4">
+    
+    <div class="col-md-6 col-lg-6">
+      <div class="card h-100 shadow-lg border-0">
+        <div class="card-header bg-transparent border-bottom border-white border-opacity-10 py-3 d-flex align-items-center">
+          <i class="bi bi-pie-chart-fill text-primary me-2"></i>
+          <h6 class="mb-0 text-white fw-bold tracking-wide text-uppercase">Fleet Composition</h6>
+        </div>
+        <div class="card-body chart-container position-relative">
+          <canvas baseChart [data]="aircraftData" type="doughnut" [options]="pieOptions"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-6">
+      <div class="card h-100 shadow-lg border-0">
+        <div class="card-header bg-transparent border-bottom border-white border-opacity-10 py-3 d-flex align-items-center">
+          <i class="bi bi-bar-chart-fill text-info me-2"></i>
+          <h6 class="mb-0 text-white fw-bold tracking-wide text-uppercase">Maintenance Load</h6>
+        </div>
+        <div class="card-body chart-container position-relative">
+          <canvas baseChart [data]="maintenanceData" type="bar" [options]="darkOptions"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-6">
+      <div class="card h-100 shadow-lg border-0">
+        <div class="card-header bg-transparent border-bottom border-white border-opacity-10 py-3 d-flex align-items-center">
+          <i class="bi bi-graph-up-arrow text-warning me-2"></i>
+          <h6 class="mb-0 text-white fw-bold tracking-wide text-uppercase">Critical Inventory</h6>
+        </div>
+        <div class="card-body chart-container position-relative">
+          <canvas baseChart [data]="inventoryData" type="bar" [options]="darkOptions"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-6">
+      <div class="card h-100 shadow-lg border-0">
+        <div class="card-header bg-transparent border-bottom border-white border-opacity-10 py-3 d-flex align-items-center">
+          <i class="bi bi-shield-check text-danger me-2"></i>
+          <h6 class="mb-0 text-white fw-bold tracking-wide text-uppercase">Audit Health</h6>
+        </div>
+        <div class="card-body chart-container position-relative">
+          <canvas baseChart [data]="complianceData" type="pie" [options]="pieOptions"></canvas>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
