@@ -14,7 +14,49 @@ $RECYCLE.BIN/
 *.lnk
 *.stackdump
 *.log.old
+# ========================
+# Node.js & Angular
+# ========================
+node_modules/
+dist/
+.angular/
+.npm/
+*.log
+.sass-cache/
+connect.lock
+coverage/
+lib/
 
+# ========================
+# .NET / C# (Backend)
+# ========================
+[Bb]in/
+[Oo]bj/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+packages/
+_ReSharper*/
+
+# Ignore local app settings that might contain secrets
+appsettings.Development.json
+appsettings.Local.json
+
+# ========================
+# IDE & Editor specific
+# ========================
+.vscode/
+.idea/
+.vs/
+*.swp
+*.swo
+
+# ========================
+# OS specific
+# ========================
+.DS_Store
+Thumbs.db
 # macOS (in case teammates use mac)
 .DS_Store
 .AppleDouble
