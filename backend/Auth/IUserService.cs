@@ -4,5 +4,5 @@ namespace AeroTrack.Api.Auth;
 
 public interface IUserService
 {
-    Task<AuthUser?> ValidateAsync(string username, string password);
+    Task<AuthUser?> Validate(string username, string password);
 }

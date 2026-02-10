@@ -26,7 +26,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Login([FromBody] LoginDto dto)
     {
-        var user = await _users.ValidateAsync(dto.username, dto.password);
+        var user = await _users.Validate(dto.username, dto.password);
         if (user is null) return Unauthorized();
 
         var claims = new List<Claim>

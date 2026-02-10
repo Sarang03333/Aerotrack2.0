@@ -13,7 +13,7 @@ public class DbUserService : IUserService
         _db = db;
     }
 
-    public async Task<AuthUser?> ValidateAsync(string username, string password)
+    public async Task<AuthUser?> Validate(string username, string password)
     {
         // 1. Normalize input to lowercase to fix case-sensitivity issues
         var normalizedUser = username.ToLower();

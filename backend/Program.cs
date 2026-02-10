@@ -2,18 +2,21 @@ using AeroTrack.Api.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;   // <-- add this
 using System.Text;
 using AeroTrack.Api.Auth;
+using AeroTrack.Api.Services;
+
 
 var builder = WebApplication.CreateBuilder(args);
-
+ 
 // DbContext
 var conn = builder.Configuration.GetConnectionString("Default");
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(conn));
-
+ 
 // Controllers (MVC)
 builder.Services.AddControllers();
-
+ 
 // CORS for Angular dev
 builder.Services.AddCors(options =>
 {
@@ -22,17 +25,45 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader()
               .AllowAnyMethod());
 });
-
+ 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
+builder.Services.AddSwaggerGen(c =>
+{
+    // Optional: explicit doc info
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "AeroTrack.Api", Version = "v1" });
+ 
+    // ===== Swagger security (Bearer JWT) =====
+    var bearerScheme = new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Description = "Enter JWT as: **Bearer {token}**",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",            // must be exactly "bearer"
+        BearerFormat = "JWT",
+        Reference = new OpenApiReference
+        {
+            Type = ReferenceType.SecurityScheme,
+            Id = "Bearer"
+        }
+    };
+ 
+    c.AddSecurityDefinition("Bearer", bearerScheme);
+ 
+    // Apply globally; Swagger will show the padlock button
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        [bearerScheme] = Array.Empty<string>()
+    });
+});
+ 
 // ===== AuthN / AuthZ =====
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         var key = builder.Configuration["Jwt:Key"]!;
-        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+        options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidateAudience = true,
@@ -43,7 +74,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
         };
     });
-
+ 
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", p => p.RequireRole("Admin"));
@@ -51,26 +82,38 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("MaintenanceTransition", p => p.RequireRole("Admin", "Maintenance"));
     options.AddPolicy("InventoryWrite", p => p.RequireRole("Admin", "InventoryManager"));
     options.AddPolicy("ComplianceWrite", p => p.RequireRole("Admin", "ComplianceOfficer"));
-    options.AddPolicy("AnyRole", p => p.RequireRole("Admin","Maintenance","InventoryManager","ComplianceOfficer"));
+    options.AddPolicy("AnyRole", p => p.RequireRole("Admin", "Maintenance", "InventoryManager", "ComplianceOfficer"));
 });
-
+ 
 // We use AddScoped because DbContext is Scoped (created per request)
 builder.Services.AddScoped<IUserService, DbUserService>();
+builder.Services.AddScoped<IMaintenanceService, MaintenanceService>();
+builder.Services.AddScoped<IComplianceService, ComplianceService>();
+builder.Services.AddScoped<IInventoryService, InventoryService>();
+builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IIdGeneratorService, IdGeneratorService>();
 
+ 
 var app = builder.Build();
-
+ 
 Console.WriteLine($"ENV: {app.Environment.EnvironmentName}");
-
+ 
 app.UseCors("SpaDev");
-
+ 
+// You can keep Swagger in all envs for now
 app.UseSwagger();
-app.UseSwaggerUI();
-
-app.UseAuthentication();
+app.UseSwaggerUI(o =>
+{
+    // Optional: ensure the endpoint is set when using c.SwaggerDoc above
+    o.SwaggerEndpoint("/swagger/v1/swagger.json", "AeroTrack.Api v1");
+    o.DisplayRequestDuration();
+});
+ 
+app.UseAuthentication();   // must be before UseAuthorization
 app.UseAuthorization();
-
+ 
 app.MapControllers();
-
+ 
 app.MapGet("/", () => Results.Ok(new { service = "AeroTrack API", ok = true }));
-
+ 
 app.Run();
