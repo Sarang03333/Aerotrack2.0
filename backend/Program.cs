@@ -6,6 +6,7 @@ using Microsoft.OpenApi.Models;   // <-- add this
 using System.Text;
 using AeroTrack.Api.Auth;
 using AeroTrack.Api.Services;
+using AeroTrack.Api.Infrastructure.Middleware;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -86,6 +87,7 @@ builder.Services.AddAuthorization(options =>
 });
  
 // We use AddScoped because DbContext is Scoped (created per request)
+builder.Services.AddScoped<IAircraftService, AircraftService>();
 builder.Services.AddScoped<IUserService, DbUserService>();
 builder.Services.AddScoped<IMaintenanceService, MaintenanceService>();
 builder.Services.AddScoped<IComplianceService, ComplianceService>();
@@ -99,6 +101,7 @@ var app = builder.Build();
 Console.WriteLine($"ENV: {app.Environment.EnvironmentName}");
  
 app.UseCors("SpaDev");
+app.UseMiddleware<ExceptionMiddleware>();
  
 // You can keep Swagger in all envs for now
 app.UseSwagger();

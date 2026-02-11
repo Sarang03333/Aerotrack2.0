@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AeroTrack.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ec2289f63f8b0eec6c702fc0c7d1b128b57454ca")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3b88b529ecea756f1af39ba01e65430ce5aa8e98")]
 [assembly: System.Reflection.AssemblyProductAttribute("AeroTrack.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AeroTrack.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

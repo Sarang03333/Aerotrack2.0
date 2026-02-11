@@ -7,7 +7,13 @@ namespace AeroTrack.Api.Services;
 public class InventoryService : IInventoryService
 {
     private readonly AppDbContext _db;
-    public InventoryService(AppDbContext db) => _db = db;
+    private readonly ILogger<InventoryService> _logger;
+
+    public InventoryService(AppDbContext db, ILogger<InventoryService> logger)
+    {
+        _db = db;
+        _logger = logger;
+    }
 
     public async Task<IEnumerable<SparePart>> GetAllAsync() => 
         await _db.SpareParts.AsNoTracking().ToListAsync();
@@ -15,6 +21,8 @@ public class InventoryService : IInventoryService
     public async Task<SparePart?> CreateAsync(SparePart p)
     {
         if (await _db.SpareParts.AnyAsync(x => x.PartId == p.PartId)) return null;
+        
+        _logger.LogInformation("Added new Spare Part: {PartName} ({PartId})", p.Name, p.PartId);
         _db.SpareParts.Add(p);
         await _db.SaveChangesAsync();
         return p;
@@ -24,32 +32,41 @@ public class InventoryService : IInventoryService
     {
         var existing = await _db.SpareParts.FindAsync(id);
         if (existing is null) return false;
+        
         existing.Name = p.Name;
         existing.QuantityAvailable = p.QuantityAvailable;
         existing.ReorderLevel = p.ReorderLevel;
         existing.LastUpdated = DateOnly.FromDateTime(DateTime.UtcNow);
+        
         await _db.SaveChangesAsync();
         return true;
     }
 
-   public async Task<object?> ReplenishAsync(string id)
-{
-    var p = await _db.SpareParts.FindAsync(id);
-    if (p is null) return null;
+    public async Task<object?> ReplenishAsync(string id)
+    {
+        var p = await _db.SpareParts.FindAsync(id);
+        if (p is null) return null;
+        
+        var add = Math.Max(p.ReorderLevel * 2 - p.QuantityAvailable, p.ReorderLevel);
+        var oldQ = p.QuantityAvailable;
+        
+        p.QuantityAvailable += add;
+        p.LastUpdated = DateOnly.FromDateTime(DateTime.UtcNow);
+        
+        await _db.SaveChangesAsync();
 
-    var add = Math.Max(p.ReorderLevel * 2 - p.QuantityAvailable, p.ReorderLevel);
-    
-    p.QuantityAvailable += add;
-    p.LastUpdated = DateOnly.FromDateTime(DateTime.UtcNow);
-    
-    await _db.SaveChangesAsync();
-    return new { added = add, p.QuantityAvailable };
-}
+        _logger.LogInformation("Replenished Part {PartId}. Added {Added} items. (Old: {Old}, New: {New})", 
+            id, add, oldQ, p.QuantityAvailable);
+            
+        return new { added = add, p.QuantityAvailable };
+    }
 
     public async Task<bool> DeleteAsync(string id)
     {
         var p = await _db.SpareParts.FindAsync(id);
         if (p is null) return false;
+        
+        _logger.LogWarning("Deleting Spare Part {PartId} from Inventory", id);
         _db.SpareParts.Remove(p);
         await _db.SaveChangesAsync();
         return true;

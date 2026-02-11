@@ -7,14 +7,27 @@ namespace AeroTrack.Api.Services;
 public class ComplianceService : IComplianceService
 {
     private readonly AppDbContext _db;
-    public ComplianceService(AppDbContext db) => _db = db;
+    private readonly ILogger<ComplianceService> _logger;
+
+    public ComplianceService(AppDbContext db, ILogger<ComplianceService> logger)
+    {
+        _db = db;
+        _logger = logger;
+    }
 
     public async Task<IEnumerable<AuditLog>> GetAllAsync() => 
         await _db.AuditLogs.AsNoTracking().ToListAsync();
 
     public async Task<AuditLog?> CreateAsync(AuditLog a)
     {
-        if (!await _db.Aircraft.AnyAsync(x => x.AircraftId == a.AircraftId)) return null;
+        _logger.LogInformation("Filing Audit Report {AuditId} for Aircraft {AircraftId}", a.AuditId, a.AircraftId);
+
+        if (!await _db.Aircraft.AnyAsync(x => x.AircraftId == a.AircraftId))
+        {
+            _logger.LogWarning("Audit failed: Invalid Aircraft {AircraftId}", a.AircraftId);
+            return null;
+        }
+        
         if (await _db.AuditLogs.AnyAsync(x => x.AuditId == a.AuditId)) return null;
 
         a.Severity = NormalizeSeverity(a.Severity);
@@ -24,6 +37,8 @@ public class ComplianceService : IComplianceService
         await _db.SaveChangesAsync();
         
         await RecalculateCompliance(a.AircraftId);
+        
+        _logger.LogInformation("Audit {AuditId} filed. Severity: {Severity}", a.AuditId, a.Severity);
         return a;
     }
 
@@ -31,6 +46,8 @@ public class ComplianceService : IComplianceService
     {
         var a = await _db.AuditLogs.FindAsync(id);
         if (a is null) return false;
+
+        _logger.LogInformation("Updating Audit {AuditId}", id);
 
         var prevAc = a.AircraftId;
         a.AircraftId = patch.AircraftId;
@@ -50,6 +67,8 @@ public class ComplianceService : IComplianceService
     {
         var a = await _db.AuditLogs.FindAsync(id);
         if (a is null) return false;
+        
+        _logger.LogWarning("Deleting Audit Report {AuditId}", id);
         
         var acId = a.AircraftId;
         _db.AuditLogs.Remove(a);
@@ -71,6 +90,7 @@ public class ComplianceService : IComplianceService
         var ac = await _db.Aircraft.FindAsync(aircraftId);
         if (ac != null && ac.ComplianceStatus != newStatus)
         {
+            _logger.LogWarning("Compliance Status Change: Aircraft {AircraftId} is now {Status}", aircraftId, newStatus);
             ac.ComplianceStatus = newStatus;
             await _db.SaveChangesAsync();
         }
