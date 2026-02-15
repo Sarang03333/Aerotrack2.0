@@ -137,3 +137,5 @@ C:\Users\2460684\OneDrive - Cognizant\Desktop\aerotrack-fullstack-r4\backend\obj
 C:\Users\2460684\OneDrive - Cognizant\Desktop\aerotrack-fullstack-r4\backend\obj\Debug\net8.0\ref\AeroTrack.Api.dll
 C:\Users\2460684\OneDrive - Cognizant\Desktop\aerotrack-fullstack-r4\backend\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 C:\Users\2460684\OneDrive - Cognizant\Desktop\aerotrack-fullstack-r4\backend\obj\Debug\net8.0\AeroTrack.Api.sourcelink.json
+C:\Users\2460684\OneDrive - Cognizant\Desktop\aerotrack-fullstack-r4\backend\bin\Debug\net8.0\DotNetEnv.dll
+C:\Users\2460684\OneDrive - Cognizant\Desktop\aerotrack-fullstack-r4\backend\bin\Debug\net8.0\Sprache.dll

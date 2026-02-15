@@ -9,6 +9,7 @@ using AeroTrack.Api.Services;
 using AeroTrack.Api.Infrastructure.Middleware;
 
 
+
 var builder = WebApplication.CreateBuilder(args);
  
 // DbContext
@@ -93,7 +94,6 @@ builder.Services.AddScoped<IMaintenanceService, MaintenanceService>();
 builder.Services.AddScoped<IComplianceService, ComplianceService>();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<IReportService, ReportService>();
-builder.Services.AddScoped<IIdGeneratorService, IdGeneratorService>();
 
  
 var app = builder.Build();
