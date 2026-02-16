@@ -2,13 +2,17 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class InventoryService {
-  private apiUrl = 'http://localhost:5000/api/inventory';
+  // Matches the Controller route + 'parts' segment + Port 5001
+  private apiUrl = 'https://localhost:5001/api/Inventory/parts';
 
   constructor(private http: HttpClient) { }
+
+  // Fetches the full list (used for parts-list page)
+  getParts(): Observable<any[]> {
+    return this.http.get<any[]>(this.apiUrl);
+  }
 
   getPart(id: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${id}`);
@@ -20,5 +24,9 @@ export class InventoryService {
 
   updatePart(id: string, part: any): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/${id}`, part);
+  }
+
+  deletePart(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }

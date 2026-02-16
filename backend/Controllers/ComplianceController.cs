@@ -38,6 +38,12 @@ public async Task<IActionResult> Create([FromBody] AuditCreateDto dto)
         ? BadRequest("Invalid Aircraft or Duplicate ID") 
         : CreatedAtAction(nameof(List), new { id = audit.AuditId }, res);
 }
+[HttpGet("audits/{id}")]
+public async Task<IActionResult> Get(string id)
+{
+    var audit = await _service.GetByIdAsync(id);
+    return audit == null ? NotFound() : Ok(audit);
+}
 
     [HttpPut("audits/{id}")] 
     [Authorize(Policy = "ComplianceWrite")]

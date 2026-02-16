@@ -8,7 +8,7 @@ import { AircraftService } from '../../core/services/Aircraft.service';
 @Component({
   selector: 'app-audit-form',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, NgFor],
+  imports: [ReactiveFormsModule, RouterLink, NgFor, NgIf],
   templateUrl: './audit-form.component.html'
 })
 export class AuditFormComponent implements OnInit {

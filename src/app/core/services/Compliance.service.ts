@@ -6,7 +6,8 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ComplianceService {
-  private apiUrl = 'http://localhost:5000/api/compliance/audits';
+  // Use port 5001 to match your live backend
+  private apiUrl = 'https://localhost:5001/api/compliance/audits';
 
   constructor(private http: HttpClient) { }
 
@@ -24,5 +25,10 @@ export class ComplianceService {
 
   updateAudit(id: string, audit: any): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/${id}`, audit);
+  }
+
+  // ADD THIS METHOD: Resolves ts(2339)
+  deleteAudit(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }

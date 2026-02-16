@@ -9,4 +9,5 @@ public interface IInventoryService
     Task<bool> UpdateAsync(string id, SparePart part);
     Task<object?> ReplenishAsync(string id); // Returns result object { added, total }
     Task<bool> DeleteAsync(string id);
+    Task<SparePart?> GetByIdAsync(string id);
 }

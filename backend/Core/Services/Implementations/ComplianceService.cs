@@ -14,7 +14,8 @@ public class ComplianceService : IComplianceService
         _db = db;
         _logger = logger;
     }
-
+    public async Task<AuditLog?> GetByIdAsync(string id) => 
+        await _db.AuditLogs.FindAsync(id);
     public async Task<IEnumerable<AuditLog>> GetAllAsync() => 
         await _db.AuditLogs.AsNoTracking().ToListAsync();
 

@@ -51,6 +51,13 @@ public class InventoryController : ControllerBase
 
         return await _service.UpdateAsync(id, partPatch) ? NoContent() : NotFound();
     }
+    [HttpGet("parts/{id}")]
+public async Task<IActionResult> Get(string id)
+{
+    // You must also add 'GetByIdAsync' to your IInventoryService and its implementation
+    var part = await _service.GetByIdAsync(id);
+    return part == null ? NotFound() : Ok(part);
+}
 
     [HttpPost("parts/{id}/replenish")] 
     [Authorize(Policy = "InventoryWrite")]
