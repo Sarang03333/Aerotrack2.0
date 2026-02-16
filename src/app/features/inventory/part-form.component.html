@@ -7,29 +7,38 @@
         {{ mode === 'new' ? 'Add Inventory Item' : 'Edit Part Details' }}
       </h4>
 
+      <div *ngIf="errorMessage" class="alert alert-danger border-start border-4 border-danger fade show mb-4">
+        <i class="bi bi-exclamation-octagon-fill me-2"></i>
+        <strong>Validation Error:</strong> {{ errorMessage }}
+      </div>
+
       <form [formGroup]="form" (ngSubmit)="save()" class="row g-3">
         
         <div class="col-12">
           <label class="form-label">Part ID</label>
           <input class="form-control" formControlName="partId" 
                  [readonly]="mode === 'edit'" 
-                 placeholder="e.g. SP-GEN-0001">
+                 [class.is-invalid]="form.get('partId')?.invalid && form.get('partId')?.touched"
+                 placeholder="e.g. SP-123">
+          <div class="invalid-feedback">Format: SP-XXX (e.g., SP-123)</div>
         </div>
-
         <div class="col-12">
           <label class="form-label">Part Name</label>
           <input class="form-control" formControlName="name" 
+                 [class.is-invalid]="form.get('name')?.invalid && form.get('name')?.touched"
                  placeholder="e.g. Turbine Blade Level 1">
         </div>
 
         <div class="col-md-6">
           <label class="form-label">Quantity On Hand</label>
-          <input type="number" class="form-control" formControlName="quantityAvailable" min="0">
+          <input type="number" class="form-control" formControlName="quantityAvailable" 
+                 [class.is-invalid]="form.get('quantityAvailable')?.invalid && form.get('quantityAvailable')?.touched">
         </div>
 
         <div class="col-md-6">
           <label class="form-label">Reorder Level</label>
-          <input type="number" class="form-control" formControlName="reorderLevel" min="0">
+          <input type="number" class="form-control" formControlName="reorderLevel" 
+                 [class.is-invalid]="form.get('reorderLevel')?.invalid && form.get('reorderLevel')?.touched">
         </div>
 
         <div class="col-12 mt-4 d-flex justify-content-end gap-2">

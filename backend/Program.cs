@@ -17,7 +17,14 @@ var conn = builder.Configuration.GetConnectionString("Default");
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(conn));
  
 // Controllers (MVC)
-builder.Services.AddControllers();
+// Locate this line in your Program.cs
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // This prevents the infinite loop error you see in the console
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+    });
  
 // CORS for Angular dev
 builder.Services.AddCors(options =>

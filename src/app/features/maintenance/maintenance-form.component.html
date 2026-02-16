@@ -7,13 +7,29 @@
         {{ mode === 'new' ? 'Schedule Maintenance' : 'Edit Task' }}
       </h4>
 
+      <div *ngIf="errorMessage" class="alert alert-danger border-start border-4 border-danger fade show mb-4">
+        <div class="d-flex align-items-center">
+          <i class="bi bi-exclamation-octagon-fill me-2 fs-5"></i>
+          <div>
+            <strong>Validation Error:</strong> {{ errorMessage }}
+          </div>
+        </div>
+      </div>
+
       <form [formGroup]="form" (ngSubmit)="save()" class="row g-3">
 
         <div class="col-md-6">
           <label class="form-label">Task ID</label>
-          <input class="form-control" formControlName="taskId" 
+          <input class="form-control" 
+                 formControlName="taskId" 
                  [readonly]="mode==='edit'" 
-                 placeholder="Auto-generated or e.g. MT-2026...">
+                 [class.is-invalid]="form.get('taskId')?.invalid && form.get('taskId')?.touched"
+                 placeholder="Format: MT-2026-001">
+          
+          <div class="invalid-feedback">
+            Required format: MT-YYYY-XXX (e.g., MT-2026-001)
+          </div>
+          <small *ngIf="mode === 'new'" class="text-muted opacity-75">ID must match the project convention.</small>
         </div>
 
         <div class="col-md-6">
@@ -40,8 +56,12 @@
 
         <div class="col-12">
           <label class="form-label">Task Description</label>
-          <textarea rows="3" class="form-control" formControlName="description" 
+          <textarea rows="3" 
+                    class="form-control" 
+                    formControlName="description" 
+                    [class.is-invalid]="form.get('description')?.invalid && form.get('description')?.touched"
                     placeholder="Describe the maintenance required..."></textarea>
+          <div class="invalid-feedback">Description must be at least 10 characters.</div>
         </div>
 
         <div class="col-12">

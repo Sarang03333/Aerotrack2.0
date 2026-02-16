@@ -1,31 +1,32 @@
 import { Component, OnInit } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { MockDataService } from '../../core/services/mock-data.service';
 import { NgIf } from '@angular/common';
+import { AircraftService } from '../../core/services/Aircraft.service'; // Use real service
 
 @Component({
   selector: 'app-aircraft-form',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, NgIf],
   templateUrl: './aircraft-form.component.html'
 })
 export class AircraftFormComponent implements OnInit {
   mode: 'new' | 'edit' = 'new';
   id: string | null = null;
+  errorMessage: string | null = null; // Hold backend DTO errors
 
   form = this.fb.group({
-    aircraftId: ['', Validators.required],
+    // Pattern matches the AC-XXX-000 convention
+    aircraftId: ['', [Validators.required, Validators.pattern(/^AC-[A-Z]{3}-\d{3}$/)]],
     model: ['', Validators.required],
     category: ['Commercial', Validators.required]
-    // Removed: complianceStatus (server-owned)
   });
 
   computedStatus: string | null = null;
 
   constructor(
     private fb: FormBuilder,
-    public data: MockDataService,
+    private aircraftService: AircraftService, // Inject live service
     private route: ActivatedRoute,
     private router: Router
   ) {}
@@ -35,27 +36,46 @@ export class AircraftFormComponent implements OnInit {
 
     if (this.id) {
       this.mode = 'edit';
-      const a = this.data.getAircraft(this.id);
-      if (a) {
-        this.form.patchValue({
-          aircraftId: a.aircraftId,
-          model: a.model,
-          category: a.category
-        } as any);
-        this.form.get('aircraftId')?.disable();
-        this.computedStatus = a.complianceStatus || null;
-      }
+      this.aircraftService.getAircraft(this.id).subscribe({
+        next: (a) => {
+          if (a) {
+            this.form.patchValue({
+              aircraftId: a.aircraftId,
+              model: a.model,
+              category: a.category
+            } as any);
+            this.form.get('aircraftId')?.disable();
+            this.computedStatus = a.complianceStatus || null;
+          }
+        },
+        error: () => this.errorMessage = "Failed to load aircraft details."
+      });
     } else {
       this.mode = 'new';
-      this.computedStatus = 'Pending'; // default shown; set by server on create
+      this.computedStatus = 'Pending';
     }
   }
 
   save() {
     if (this.form.invalid) return;
-    const v = this.form.getRawValue() as any;
-    if (this.mode === 'new') this.data.addAircraft(v);
-    else this.data.updateAircraft(this.id!, v);
-    this.router.navigate(['/aircraft']);
+    this.errorMessage = null;
+
+    const v = this.form.getRawValue();
+    const request$ = this.mode === 'new' 
+      ? this.aircraftService.createAircraft(v) 
+      : this.aircraftService.updateAircraft(this.id!, v);
+
+    request$.subscribe({
+      next: () => this.router.navigate(['/aircraft']),
+      error: (err) => {
+        // Parse the 400 Bad Request from the C# DTO validation
+        if (err.status === 400 && err.error?.errors) {
+          const errors = err.error.errors;
+          this.errorMessage = errors.AircraftId ? errors.AircraftId[0] : "Check aircraft details.";
+        } else {
+          this.errorMessage = "Server error: Could not save aircraft.";
+        }
+      }
+    });
   }
 }

@@ -2,11 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using AeroTrack.Api.Domain.Entities;
 using AeroTrack.Api.Services;
+using AeroTrack.Api.Core.DTOs;
 
 namespace AeroTrack.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/maintenance")] // Updated to match standard path
 [Authorize]
 public class MaintenanceController : ControllerBase
 {
@@ -17,14 +18,8 @@ public class MaintenanceController : ControllerBase
         _service = service;
     }
 
-    // Define DTO here (or move to a separate file)
-    public record EmergencyDto(string aircraftId, string description);
-
     [HttpGet("tasks")]
-    public async Task<IActionResult> List()
-    {
-        return Ok(await _service.GetAllAsync());
-    }
+    public async Task<IActionResult> List() => Ok(await _service.GetAllAsync());
 
     [HttpGet("tasks/{id}")]
     public async Task<IActionResult> Get(string id)
@@ -35,34 +30,51 @@ public class MaintenanceController : ControllerBase
 
     [HttpPost("tasks")]
     [Authorize(Policy = "MaintenanceWrite")]
-    public async Task<IActionResult> Create([FromBody] MaintenanceTask t)
+    public async Task<IActionResult> Create([FromBody] MaintenanceTaskCreateDto dto)
     {
-        var res = await _service.CreateAsync(t);
-        // FIX: Check for null (Duplicate ID)
-        if (res == null) return Conflict($"Task {t.TaskId} already exists.");
+        // Mapping DTO to Entity
+        var task = new MaintenanceTask
+        {
+            TaskId = dto.TaskId,
+            AircraftId = dto.AircraftId,
+            Description = dto.Description,
+            Priority = dto.Priority,
+            ScheduledDate = dto.ScheduledDate, 
+            IsEmergency = dto.IsEmergency,
+            Status = "PENDING"
+        };
+
+        var res = await _service.CreateAsync(task);
+        if (res == null) return Conflict($"Task {dto.TaskId} already exists or Aircraft ID is invalid.");
         
-        return CreatedAtAction(nameof(Get), new { id = t.TaskId }, t);
+        return CreatedAtAction(nameof(Get), new { id = task.TaskId }, res);
+    }
+
+    [HttpPut("tasks/{id}")]
+    [Authorize(Policy = "MaintenanceWrite")]
+    public async Task<IActionResult> Update(string id, [FromBody] MaintenanceTaskCreateDto dto)
+    {
+        // Mapping DTO to Entity for the update logic
+        var taskUpdate = new MaintenanceTask
+        {
+            AircraftId = dto.AircraftId,
+            Description = dto.Description,
+            Priority = dto.Priority,
+            ScheduledDate = dto.ScheduledDate,
+            IsEmergency = dto.IsEmergency
+        };
+
+        var success = await _service.UpdateAsync(id, taskUpdate);
+        return success ? NoContent() : NotFound();
     }
 
     [HttpPost("tasks/emergency")]
     [Authorize(Policy = "MaintenanceWrite")]
     public async Task<IActionResult> CreateEmer([FromBody] EmergencyDto dto)
     {
-        var t = await _service.CreateEmergencyAsync(dto.aircraftId, dto.description);
-
-        // FIX: Check for null (Invalid Aircraft ID)
-        if (t == null) return BadRequest($"Aircraft {dto.aircraftId} not found.");
-
-        // Now safe to access 't.TaskId'
+        var t = await _service.CreateEmergencyAsync(dto.AircraftId, dto.Description);
+        if (t == null) return BadRequest($"Aircraft {dto.AircraftId} not found.");
         return CreatedAtAction(nameof(Get), new { id = t.TaskId }, t);
-    }
-
-    [HttpPut("tasks/{id}")]
-    [Authorize(Policy = "MaintenanceWrite")]
-    public async Task<IActionResult> Update(string id, [FromBody] MaintenanceTask t)
-    {
-        var success = await _service.UpdateAsync(id, t);
-        return success ? NoContent() : NotFound();
     }
 
     [HttpPost("tasks/{id}/complete")]

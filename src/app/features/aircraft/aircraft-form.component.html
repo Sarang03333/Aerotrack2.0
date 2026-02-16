@@ -12,6 +12,11 @@
         </span>
       </div>
 
+      <div *ngIf="errorMessage" class="alert alert-danger border-start border-4 border-danger mb-4 fade show">
+        <i class="bi bi-exclamation-octagon-fill me-2"></i>
+        <strong>Validation Error:</strong> {{ errorMessage }}
+      </div>
+
       <div class="alert alert-dark border-secondary d-flex align-items-center mb-4" role="alert">
         <i class="bi bi-info-circle-fill text-info me-3 fs-4"></i>
         <div>
@@ -32,23 +37,31 @@
           <label class="form-label">Aircraft ID</label>
           <input class="form-control" formControlName="aircraftId" 
                  [readonly]="mode==='edit'" 
-                 placeholder="e.g. AC-COM-0001">
+                 [class.is-invalid]="form.get('aircraftId')?.invalid && form.get('aircraftId')?.touched"
+                 placeholder="e.g. AC-COM-001">
+          <div class="invalid-feedback">
+            Required format: AC-TYPE-XXX (e.g., AC-COM-001)
+          </div>
         </div>
 
         <div class="col-md-4">
           <label class="form-label">Model</label>
           <input class="form-control" formControlName="model" 
+                 [class.is-invalid]="form.get('model')?.invalid && form.get('model')?.touched"
                  placeholder="e.g. Boeing 737-800">
+          <div class="invalid-feedback">Model is required.</div>
         </div>
 
         <div class="col-md-4">
           <label class="form-label">Category</label>
-          <select class="form-select" formControlName="category">
+          <select class="form-select" formControlName="category"
+                  [class.is-invalid]="form.get('category')?.invalid && form.get('category')?.touched">
             <option value="" disabled selected>Select Category</option>
-            <option>Commercial</option>
-            <option>Defense</option>
-            <option>Cargo</option>
+            <option value="Commercial">Commercial</option>
+            <option value="Defense">Defense</option>
+            <option value="Cargo">Cargo</option>
           </select>
+          <div class="invalid-feedback">Please select a category.</div>
         </div>
 
         <div class="col-12 mt-4 d-flex justify-content-end gap-2">

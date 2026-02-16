@@ -17,7 +17,6 @@ public class AircraftService : IAircraftService
 
     public async Task<IEnumerable<Aircraft>> GetAllAsync()
     {
-        // FIX: Added .Include() so ServiceHistory is not null
         return await _db.Aircraft
             .Include(a => a.ServiceHistory)
             .AsNoTracking()
@@ -27,7 +26,7 @@ public class AircraftService : IAircraftService
     public async Task<Aircraft?> GetByIdAsync(string id)
     {
         return await _db.Aircraft
-            .Include(a => a.ServiceHistory) // Good to have history here too
+            .Include(a => a.ServiceHistory)
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.AircraftId == id);
     }
@@ -42,7 +41,9 @@ public class AircraftService : IAircraftService
             return false;
         }
 
+        // Set default initial status
         aircraft.ComplianceStatus = "Pending";
+        
         _db.Aircraft.Add(aircraft);
         await _db.SaveChangesAsync();
         
@@ -61,6 +62,7 @@ public class AircraftService : IAircraftService
 
         _logger.LogInformation("Updating details for Aircraft {AircraftId}", id);
         
+        // FIX: Map all fields from the DTO/Patch object to the existing entity
         existing.Model = patch.Model;
         existing.Category = patch.Category;
         

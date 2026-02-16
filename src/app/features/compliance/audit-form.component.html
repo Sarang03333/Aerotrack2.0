@@ -7,18 +7,28 @@
         {{ mode === 'new' ? 'New Audit Log' : 'Edit Audit' }}
       </h4>
 
+      <div *ngIf="errorMessage" class="alert alert-danger border-start border-4 border-danger fade show mb-4">
+        <i class="bi bi-exclamation-octagon-fill me-2"></i>
+        <strong>Validation Error:</strong> {{ errorMessage }}
+      </div>
+
       <form [formGroup]="form" (ngSubmit)="save()" class="row g-3">
         
         <div class="col-md-6">
-          <label class="form-label">Audit ID</label>
-          <input class="form-control" formControlName="auditId" 
-                 [readonly]="mode==='edit'" 
-                 placeholder="e.g. AU-2026...">
-        </div>
+  <label class="form-label">Audit ID</label>
+  <input class="form-control" formControlName="auditId" 
+         [readonly]="mode==='edit'" 
+         [class.is-invalid]="form.get('auditId')?.invalid && form.get('auditId')?.touched"
+         placeholder="e.g. AUD-002">
+  <div class="invalid-feedback">
+    Required format: AUD-XXX (e.g., AUD-002)
+  </div>
+</div>
 
         <div class="col-md-6">
           <label class="form-label">Aircraft ID</label>
-          <select class="form-select" formControlName="aircraftId">
+          <select class="form-select" formControlName="aircraftId"
+                  [class.is-invalid]="form.get('aircraftId')?.invalid && form.get('aircraftId')?.touched">
             <option value="" disabled selected>Select Aircraft</option>
             <option *ngFor="let id of aircraftIds" [value]="id">{{id}}</option>
           </select>
@@ -26,7 +36,8 @@
 
         <div class="col-md-6">
           <label class="form-label">Audit Date</label>
-          <input type="date" class="form-control" formControlName="date">
+          <input type="date" class="form-control" formControlName="date"
+                 [class.is-invalid]="form.get('date')?.invalid && form.get('date')?.touched">
         </div>
 
         <div class="col-md-6">
@@ -42,6 +53,7 @@
         <div class="col-12">
           <label class="form-label">Findings & Notes</label>
           <textarea rows="4" class="form-control" formControlName="findings"
+                    [class.is-invalid]="form.get('findings')?.invalid && form.get('findings')?.touched"
                     placeholder='Describe findings or type "No discrepancies."'></textarea>
         </div>
 
@@ -53,7 +65,6 @@
         </div>
 
       </form>
-
     </div>
   </div>
 </div>

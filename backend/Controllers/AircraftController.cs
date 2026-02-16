@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using AeroTrack.Api.Domain.Entities;
 using AeroTrack.Api.Services;
+using AeroTrack.Api.Core.DTOs;
 
 namespace AeroTrack.Api.Controllers;
 
@@ -19,28 +20,24 @@ public class AircraftController : ControllerBase
 
     // GET: /api/aircraft
     [HttpGet]
-    [ProducesResponseType(typeof(IEnumerable<object>), StatusCodes.Status200OK)]
     public async Task<IActionResult> List()
     {
         var list = await _service.GetAllAsync();
 
-        // Map to DTO to include calculated 'lastServiceDate'
-        var dto = list.Select(a => new {
+        // Map to anonymous DTO for the list view to include calculated 'lastServiceDate'
+        var result = list.Select(a => new {
             a.AircraftId,
             a.Model,
             a.Category,
             a.ComplianceStatus,
-            // LOGIC: Find the latest date in the history list
             lastServiceDate = a.ServiceHistory?.OrderBy(x => x.Date).LastOrDefault()?.Date
         });
 
-        return Ok(dto);
+        return Ok(result);
     }
 
     // GET: /api/aircraft/{id}
     [HttpGet("{id}")]
-    [ProducesResponseType(typeof(Aircraft), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get(string id)
     {
         var aircraft = await _service.GetByIdAsync(id);
@@ -50,25 +47,35 @@ public class AircraftController : ControllerBase
     // POST: /api/aircraft (Admin only)
     [Authorize(Policy = "AdminOnly")]
     [HttpPost]
-    [ProducesResponseType(typeof(Aircraft), StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> Create([FromBody] Aircraft a)
+    public async Task<IActionResult> Create([FromBody] AircraftCreateDto dto)
     {
-        var success = await _service.CreateAsync(a);
+        // Explicitly map DTO to Entity
+        var aircraft = new Aircraft
+        {
+            AircraftId = dto.AircraftId,
+            Model = dto.Model,
+            Category = dto.Category,
+        };
+
+        var success = await _service.CreateAsync(aircraft);
 
         if (!success)
-            return Conflict($"Aircraft {a.AircraftId} already exists.");
+            return Conflict($"Aircraft {dto.AircraftId} already exists.");
 
-        return CreatedAtAction(nameof(Get), new { id = a.AircraftId }, a);
+        return CreatedAtAction(nameof(Get), new { id = aircraft.AircraftId }, aircraft);
     }
 
     // PUT: /api/aircraft/{id} (Admin only)
     [Authorize(Policy = "AdminOnly")]
     [HttpPut("{id}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(string id, [FromBody] Aircraft patch)
+    public async Task<IActionResult> Update(string id, [FromBody] AircraftCreateDto dto)
     {
+        var patch = new Aircraft
+        {
+            Model = dto.Model,
+            Category = dto.Category,
+        };
+
         var success = await _service.UpdateAsync(id, patch);
         return success ? NoContent() : NotFound();
     }
@@ -76,8 +83,6 @@ public class AircraftController : ControllerBase
     // DELETE: /api/aircraft/{id} (Admin only)
     [Authorize(Policy = "AdminOnly")]
     [HttpDelete("{id}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(string id)
     {
         var success = await _service.DeleteAsync(id);
