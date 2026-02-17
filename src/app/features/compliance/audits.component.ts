@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { AsyncPipe, NgFor, DatePipe } from "@angular/common";
 import { RouterLink } from "@angular/router";
-import { ComplianceService } from "../../core/services/Compliance.service"; // Use live service
+import { ComplianceService } from "../../core/services/Compliance.service"; 
 import { Observable } from 'rxjs';
 
 @Component({
@@ -16,7 +16,7 @@ export class AuditsComponent implements OnInit {
   constructor(private complianceService: ComplianceService) {}
 
   ngOnInit() {
-    this.refresh();
+    this.refresh(); // Reloads data every time user enters the compliance list
   }
 
   refresh() {
@@ -25,10 +25,9 @@ export class AuditsComponent implements OnInit {
 
   remove(id: string) {
     if (confirm('Are you sure you want to delete this audit report?')) {
-      // Calls the newly added service method
       this.complianceService.deleteAudit(id).subscribe({
         next: () => {
-          this.refresh(); // Reload table from SQL Express
+          this.refresh(); // UI reflects deletion immediately
         },
         error: (err) => {
           console.error("Delete failed", err);

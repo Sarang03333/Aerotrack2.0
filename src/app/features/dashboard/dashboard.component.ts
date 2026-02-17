@@ -8,7 +8,7 @@ import { ChartConfiguration, ChartOptions } from "chart.js";
 @Component({
   selector: "app-dashboard",
   standalone: true,
-  imports: [CommonModule, StatCardComponent, BaseChartDirective],
+  imports: [CommonModule, BaseChartDirective],
   templateUrl: "./dashboard.component.html",
   styleUrls: ["./dashboard.component.css"],
 })
