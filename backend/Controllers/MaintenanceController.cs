@@ -7,7 +7,7 @@ using AeroTrack.Api.Core.DTOs;
 namespace AeroTrack.Api.Controllers;
 
 [ApiController]
-[Route("api/maintenance")] // Updated to match standard path
+[Route("api/maintenance")] 
 [Authorize]
 public class MaintenanceController : ControllerBase
 {
@@ -32,7 +32,6 @@ public class MaintenanceController : ControllerBase
     [Authorize(Policy = "MaintenanceWrite")]
     public async Task<IActionResult> Create([FromBody] MaintenanceTaskCreateDto dto)
     {
-        // Mapping DTO to Entity
         var task = new MaintenanceTask
         {
             TaskId = dto.TaskId,
@@ -41,7 +40,7 @@ public class MaintenanceController : ControllerBase
             Priority = dto.Priority,
             ScheduledDate = dto.ScheduledDate, 
             IsEmergency = dto.IsEmergency,
-            Status = "PENDING"
+            Status = dto.Status // Maps initial status from your DTO
         };
 
         var res = await _service.CreateAsync(task);
@@ -61,7 +60,8 @@ public class MaintenanceController : ControllerBase
             Description = dto.Description,
             Priority = dto.Priority,
             ScheduledDate = dto.ScheduledDate,
-            IsEmergency = dto.IsEmergency
+            IsEmergency = dto.IsEmergency,
+            Status = dto.Status // FIXED: Explicitly mapping Status so "In-Progress" saves
         };
 
         var success = await _service.UpdateAsync(id, taskUpdate);
@@ -77,13 +77,13 @@ public class MaintenanceController : ControllerBase
         return CreatedAtAction(nameof(Get), new { id = t.TaskId }, t);
     }
 
-    [HttpPost("tasks/{id}/complete")]
-    [Authorize(Policy = "MaintenanceTransition")]
-    public async Task<IActionResult> Complete(string id)
-    {
-        var success = await _service.CompleteTaskAsync(id);
-        return success ? NoContent() : NotFound();
-    }
+    [HttpPut("tasks/{id}/complete")] // Change from HttpPost to HttpPut
+[Authorize(Policy = "MaintenanceTransition")]
+public async Task<IActionResult> Complete(string id)
+{
+    var success = await _service.CompleteTaskAsync(id);
+    return success ? NoContent() : NotFound();
+}
 
     [HttpDelete("tasks/{id}")]
     [Authorize(Policy = "AdminOnly")]

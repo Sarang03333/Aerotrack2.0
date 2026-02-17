@@ -1,12 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AsyncPipe, NgFor, NgClass, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { MockDataService } from '../../core/services/mock-data.service';
+import { MaintenanceService } from '../../core/services/Maintenance.service'; 
 import { SearchPipe } from '../../shared/pipes/search.pipe';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import { MaintenanceTask } from '../../core/models/maintenance-task';
 
 @Component({
   selector: 'app-list-maintenance',
@@ -14,17 +13,40 @@ import { MaintenanceTask } from '../../core/models/maintenance-task';
   imports: [AsyncPipe, NgFor, NgClass, DatePipe, FormsModule, RouterLink, SearchPipe],
   templateUrl: './list-maintenance.component.html'
 })
-export class ListMaintenanceComponent {
+export class ListMaintenanceComponent implements OnInit {
   term = '';
-  tasks$ = this.data.taskList$;
+  tasks$!: Observable<any[]>;
+  hasEmergency$!: Observable<boolean>;
 
-  // NEW: derive a simple boolean observable for the banner
-  hasEmergency$: Observable<boolean> = this.tasks$.pipe(
-    map((list: MaintenanceTask[] = []) => list.some(t => t.isEmergency))
-  );
+  // FIX: Ensure 'private' is used so 'this.maintenanceService' becomes a class property
+  constructor(private maintenanceService: MaintenanceService) {}
 
-  constructor(public data: MockDataService) {}
+  ngOnInit() {
+    this.refresh(); // Now this will work because the method is defined below
+  }
 
-  complete(id: string) { this.data.completeTask(id); }
-  remove(id: string) { this.data.deleteTask(id); }
+  // FIX: Explicitly define the refresh method
+  refresh() {
+    this.tasks$ = this.maintenanceService.getTasks();
+    this.hasEmergency$ = this.tasks$.pipe(
+      map((list: any[] = []) => list.some(t => t.isEmergency))
+    );
+  }
+
+  complete(id: string) {
+    // Calling refresh inside subscribe ensures the UI updates after the DB change
+    this.maintenanceService.completeTask(id).subscribe({
+      next: () => this.refresh(), 
+      error: (err: any) => console.error("Completion failed", err)
+    });
+  }
+
+  remove(id: string) {
+    if (confirm('Are you sure you want to delete this task?')) {
+      this.maintenanceService.deleteTask(id).subscribe({
+        next: () => this.refresh(),
+        error: (err: any) => console.error("Delete failed", err)
+      });
+    }
+  }
 }

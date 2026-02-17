@@ -28,7 +28,7 @@
         <li class="nav-item" *ngIf="auth.isInRole('Admin', 'ComplianceOfficer')">
           <a class="nav-link" routerLink="/compliance" routerLinkActive="active">Compliance</a>
         </li>
-        <li class="nav-item" *ngIf="auth.isInRole('Admin', 'Maintenance', 'ComplianceOfficer')">
+        <li class="nav-item" *ngIf="auth.isInRole('Admin', 'Maintenance', 'ComplianceOfficer','InventoryManager')">
   <a class="nav-link" routerLink="/reports" routerLinkActive="active">Reports</a>
 </li>
       </ul>

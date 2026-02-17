@@ -127,8 +127,8 @@ export const routes: Routes = [
   { 
         path: 'reports', 
         component:ReportsComponent,
-        canActivate: [roleGuard(['Admin', 'Maintenance', 'ComplianceOfficer'])],
-        data: { roles: ['Admin', 'Maintenance', 'ComplianceOfficer'] } // Adjust roles as needed
+        canActivate: [roleGuard(['Admin', 'Maintenance', 'ComplianceOfficer','InventoryManager'])],
+        data: { roles: ['Admin', 'Maintenance', 'ComplianceOfficer','InventoryManager'] } 
     },
 
   // Fallback

@@ -2,8 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgFor, NgIf } from '@angular/common';
-
-// FIX: Ensure these paths point correctly to your core services folder
 import { MaintenanceService } from '../../core/services/Maintenance.service'; 
 import { AircraftService } from '../../core/services/Aircraft.service';
 
@@ -30,7 +28,6 @@ export class MaintenanceFormComponent implements OnInit {
 
   aircraftIds: string[] = [];
 
-  // FIX: Parameter names are private to avoid "Value not found" errors
   constructor(
     private fb: FormBuilder,
     private maintenanceService: MaintenanceService, 
@@ -40,7 +37,6 @@ export class MaintenanceFormComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Load live aircraft IDs from your SQL Express backend
     this.aircraftService.getAircrafts().subscribe({
       next: (list) => this.aircraftIds = list.map(a => a.aircraftId),
       error: () => this.errorMessage = "Could not load aircraft list."
@@ -49,9 +45,10 @@ export class MaintenanceFormComponent implements OnInit {
     this.id = this.route.snapshot.paramMap.get('id');
     if (this.id) {
       this.mode = 'edit';
-      this.maintenanceService.getTask(this.id).subscribe(t => {
+      // FIXED: Added type (t: any) to resolve ts(7006)
+      this.maintenanceService.getTask(this.id).subscribe((t: any) => {
         if (t) {
-          this.form.patchValue(t as any);
+          this.form.patchValue(t);
           this.form.get('taskId')?.disable();
         }
       });
@@ -69,11 +66,9 @@ export class MaintenanceFormComponent implements OnInit {
 
     request$.subscribe({
       next: () => this.router.navigate(['/maintenance']),
-      error: (err) => {
-        // Handle the 400 Bad Request from the AeroTrack API
+      error: (err: any) => { // FIXED: Added type (err: any) to resolve ts(7006)
         if (err.status === 400 && err.error?.errors) {
-          const errors = err.error.errors;
-          this.errorMessage = errors.TaskId ? errors.TaskId[0] : "Validation failed.";
+          this.errorMessage = err.error.errors.TaskId ? err.error.errors.TaskId[0] : "Validation failed.";
         } else {
           this.errorMessage = "An error occurred while saving.";
         }
