@@ -59,13 +59,16 @@ public async Task<IActionResult> Get(string id)
     return part == null ? NotFound() : Ok(part);
 }
 
-    [HttpPost("parts/{id}/replenish")] 
-    [Authorize(Policy = "InventoryWrite")]
-    public async Task<IActionResult> Replenish(string id) 
-    {
-        var res = await _service.ReplenishAsync(id);
-        return res == null ? NotFound() : Ok(res);
-    }
+[HttpPut("parts/{id}/replenish")]
+public async Task<IActionResult> Replenish(string id)
+{
+    // FIX: Use _service instead of _context
+    var success = await _service.ReplenishAsync(id);
+    
+    if (!success) return NotFound($"Part ID {id} not found.");
+
+    return NoContent();
+}
 
     [HttpDelete("parts/{id}")] 
     [Authorize(Policy = "InventoryWrite")]

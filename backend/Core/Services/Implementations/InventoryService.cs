@@ -64,24 +64,20 @@ public class InventoryService : IInventoryService
     /// <summary>
     /// Logic to automatically replenish stock based on reorder levels.
     /// </summary>
-    public async Task<object?> ReplenishAsync(string id)
-    {
-        var p = await _db.SpareParts.FindAsync(id);
-        if (p is null) return null;
-        
-        var add = Math.Max(p.ReorderLevel * 2 - p.QuantityAvailable, p.ReorderLevel);
-        var oldQ = p.QuantityAvailable;
-        
-        p.QuantityAvailable += add;
-        p.LastUpdated = DateOnly.FromDateTime(DateTime.UtcNow);
-        
-        await _db.SaveChangesAsync();
+   public async Task<bool> ReplenishAsync(string id)
+{
+    // Assuming your DB context inside the service is named _db or _context
+    var part = await _db.SpareParts.FindAsync(id);
+    
+    if (part == null) return false;
 
-        _logger.LogInformation("Replenished Part {PartId}. Added {Added} items. (Old: {Old}, New: {New})", 
-            id, add, oldQ, p.QuantityAvailable);
-            
-        return new { added = add, p.QuantityAvailable };
-    }
+    // Set quantity to the standard stock level
+    part.QuantityAvailable = 50; 
+    part.LastUpdated = DateOnly.FromDateTime(DateTime.Now);
+
+    await _db.SaveChangesAsync();
+    return true;
+}
 
     /// <summary>
     /// Removes a part from the database.

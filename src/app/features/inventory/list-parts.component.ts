@@ -36,8 +36,19 @@ export class ListPartsComponent implements OnInit {
   }
 
   replenish(id: string) {
-    // Implementation for live replenishment
-  }
+  // 1. Call the service to update the database
+  this.inventoryService.replenishPart(id).subscribe({
+    next: () => {
+      // 2. Refresh the parts$ observable to show the updated quantity
+      this.refresh(); 
+      console.log(`Part ${id} replenished successfully.`);
+    },
+    error: (err) => {
+      console.error("Replenishment failed:", err);
+      alert("Could not replenish part. Check if the backend is running.");
+    }
+  });
+}
 
   remove(id: string) {
     if (confirm('Are you sure you want to delete this part?')) {

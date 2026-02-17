@@ -29,4 +29,8 @@ export class InventoryService {
   deletePart(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+  replenishPart(id: string): Observable<any> {
+  // This calls the replenishment endpoint on your ASP.NET Core controller
+  return this.http.put<any>(`${this.apiUrl}/${id}/replenish`, {});
+}
 }
