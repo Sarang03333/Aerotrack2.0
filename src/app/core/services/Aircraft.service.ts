@@ -24,7 +24,6 @@ export class AircraftService {
     return this.http.put(`${this.apiUrl}/${id}`, dto);
   }
 
-  // Added deleteAircraft to resolve ts(2551)
   deleteAircraft(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }

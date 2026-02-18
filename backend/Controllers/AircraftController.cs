@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using AeroTrack.Api.Domain.Entities;
 using AeroTrack.Api.Services;
 using AeroTrack.Api.Core.DTOs;
+using AeroTrack.Api.Infrastructure;
 
 namespace AeroTrack.Api.Controllers;
 
@@ -12,11 +14,37 @@ namespace AeroTrack.Api.Controllers;
 public class AircraftController : ControllerBase
 {
     private readonly IAircraftService _service;
+    private readonly AppDbContext _db;
 
-    public AircraftController(IAircraftService service) => _service = service;
+    public AircraftController(IAircraftService service, AppDbContext db)
+    {
+        _service = service;
+        _db = db;
+    }
 
     [HttpGet]
-    public async Task<IActionResult> List() => Ok(await _service.GetAllAsync());
+    [HttpGet]
+public async Task<IActionResult> List()
+{
+    // Explicitly include the history to avoid empty dates in the UI
+    var list = await _db.Aircraft
+        .Include(a => a.ServiceHistory) 
+        .AsNoTracking()
+        .ToListAsync();
+
+    var result = list.Select(a => new {
+        a.AircraftId,
+        a.Model,
+        a.Category,
+        a.ComplianceStatus,
+        // FIX: Cast to DateOnly? so the expression can return null if no history exists
+        lastServiceDate = a.ServiceHistory != null && a.ServiceHistory.Any()
+            ? (DateOnly?)a.ServiceHistory.Max(x => x.Date) 
+            : (DateOnly?)null
+    });
+
+    return Ok(result);
+}
 
     [HttpGet("{id}")]
     public async Task<IActionResult> Get(string id)
@@ -29,17 +57,16 @@ public class AircraftController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] AircraftCreateDto dto)
     {
-        // MANUAL MAPPING: Explicitly assigning every property
         var aircraft = new Aircraft
         {
             AircraftId = dto.AircraftId,
             Model = dto.Model,
             Category = dto.Category,
-            ComplianceStatus = "Pending" // Ensure a default status is set
+            ComplianceStatus = "Pending" // Required to prevent SQL null errors
         };
 
-        var res = await _service.CreateAsync(aircraft);
-        if (!res) return Conflict($"Aircraft {dto.AircraftId} already exists.");
+        var success = await _service.CreateAsync(aircraft);
+        if (!success) return Conflict($"Aircraft {dto.AircraftId} already exists.");
 
         return CreatedAtAction(nameof(Get), new { id = aircraft.AircraftId }, aircraft);
     }
@@ -54,11 +81,15 @@ public class AircraftController : ControllerBase
             Category = dto.Category
         };
 
-        return await _service.UpdateAsync(id, patch) ? NoContent() : NotFound();
+        var success = await _service.UpdateAsync(id, patch);
+        return success ? NoContent() : NotFound();
     }
 
     [Authorize(Policy = "AdminOnly")]
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(string id) =>
-        await _service.DeleteAsync(id) ? NoContent() : NotFound();
+    public async Task<IActionResult> Delete(string id)
+    {
+        var success = await _service.DeleteAsync(id);
+        return success ? NoContent() : NotFound();
+    }
 }
