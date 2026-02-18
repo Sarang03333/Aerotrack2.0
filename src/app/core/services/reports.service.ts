@@ -23,4 +23,7 @@ export class ReportsService {
   downloadFleetReport(): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/fleet-summary`, { responseType: 'blob' });
   }
+  getUpcomingTasks(): Observable<any[]> {
+  return this.http.get<any[]>(`${this.apiUrl}/upcoming`);
+}
 }

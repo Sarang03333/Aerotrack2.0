@@ -1,64 +1,69 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReportsService, ReportStats } from '../../core/services/reports.service';
-
 @Component({
   selector: 'app-reports',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './reports.component.html',
   styles: [`
-    /* Wrapper to kill white space and match theme */
     :host {
-      display: block;
-      background: #0f172a; 
-      min-height: 100vh;
-      margin: -24px; /* Counteracts standard page padding */
-      padding: 24px;
+      display: block; background: #020617; min-height: 100vh;
+      margin: -24px; padding: 24px;
+    }
+    .dashboard-container { width: 100%; max-width: 100%; }
+
+    /* bluish glass cards with extra padding for corner protection */
+    .stat-card, .report-card {
+      background: rgba(15, 23, 42, 0.6) !important;
+      backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(59, 130, 246, 0.25) !important;
+      border-radius: 20px;
+      padding: 2rem !important; 
+      overflow: hidden;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
     }
 
-    .dashboard-container { 
-      width: 100%; 
-      max-width: 100%; /* Ensures full-width span */
+    /* Small modifier for the top-aligned report card */
+    .col-md-5 .report-card {
+      padding: 1.25rem 1.5rem !important;
     }
 
-    .stat-card {
-      background: rgba(30, 41, 59, 0.7);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      padding: 1.5rem;
-    }
+    .tiny { font-size: 0.7rem; color: #64748b; }
 
-    .report-card {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 16px;
+    .forecast-table tbody tr td {
+      background: transparent !important;
+      color: #cbd5e1 !important;
+      border-bottom: 1px solid rgba(59, 130, 246, 0.1) !important;
+      padding: 1.5rem 1rem !important;
     }
-
-    .text-gradient {
-      background: linear-gradient(to right, #60a5fa, #a78bfa);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+    
+    .text-info { color: #60a5fa !important; }
   `]
 })
 export class ReportsComponent implements OnInit {
   stats: ReportStats | null = null;
+  upcomingTasks: any[] = []; // New forecast array
   isGenerating = false;
 
-  // Injecting the new ReportsService
   constructor(private reportsService: ReportsService) {}
 
   ngOnInit() {
     this.fetchOverview();
+    this.fetchUpcoming(); // Load forecast on init
   }
 
   fetchOverview() {
-    // Calling the service instead of direct HttpClient
     this.reportsService.getOverview().subscribe({
       next: (data) => this.stats = data,
-      error: (err) => console.error('Error fetching report stats:', err)
+      error: (err) => console.error('Error fetching stats:', err)
+    });
+  }
+
+  fetchUpcoming() {
+    this.reportsService.getUpcomingTasks().subscribe({
+      next: (data) => this.upcomingTasks = data,
+      error: (err) => console.error('Error fetching forecast:', err)
     });
   }
 

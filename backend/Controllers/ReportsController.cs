@@ -16,4 +16,6 @@ public class ReportsController : ControllerBase {
         var bytes = await _service.GenerateFleetReportCsvAsync();
         return File(bytes, "text/csv", $"Report_{DateTime.UtcNow:yyyyMMdd}.csv");
     }
+    [HttpGet("upcoming")]
+public async Task<IActionResult> GetUpcoming() => Ok(await _service.GetUpcomingTasksAsync());
 }

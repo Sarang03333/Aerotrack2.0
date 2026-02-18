@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text;
 using AeroTrack.Api.Infrastructure;
 using AeroTrack.Api.Core.DTOs;
+using AeroTrack.Api.Domain.Entities;
 
 namespace AeroTrack.Api.Services;
 
@@ -57,4 +58,20 @@ public class ReportService : IReportService
         }
         return Encoding.UTF8.GetBytes(sb.ToString());
     }
+   public async Task<List<MaintenanceTask>> GetUpcomingTasksAsync()
+{
+    // Fix: Use DateTime.Today to get the start of the day
+    var today = DateOnly.FromDateTime(DateTime.Today);
+    // Fix: Extend range slightly or ensure inclusive upper bound
+    var nextWeek = today.AddDays(7);
+
+    return await _db.MaintenanceTasks
+        .AsNoTracking()
+        // Ensure we catch everything from the start of today to the end of next week
+        .Where(t => t.ScheduledDate >= today && t.ScheduledDate <= nextWeek)
+        // Only show pending work to keep the forecast actionable
+        .Where(t => t.Status != "Completed" && t.Status != "COMPLETED")
+        .OrderBy(t => t.ScheduledDate)
+        .ToListAsync();
+}
 }
