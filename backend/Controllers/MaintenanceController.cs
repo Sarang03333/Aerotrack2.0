@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using AeroTrack.Api.Domain.Entities;
 using AeroTrack.Api.Services;
 using AeroTrack.Api.Core.DTOs;
+using AutoMapper;
 
 namespace AeroTrack.Api.Controllers;
 
@@ -12,10 +13,12 @@ namespace AeroTrack.Api.Controllers;
 public class MaintenanceController : ControllerBase
 {
     private readonly IMaintenanceService _service;
+    private readonly IMapper _mapper;
 
-    public MaintenanceController(IMaintenanceService service)
+    public MaintenanceController(IMaintenanceService service, IMapper mapper)
     {
         _service = service;
+        _mapper = mapper;
     }
 
     [HttpGet("tasks")]
@@ -32,19 +35,9 @@ public class MaintenanceController : ControllerBase
     [Authorize(Policy = "MaintenanceWrite")]
     public async Task<IActionResult> Create([FromBody] MaintenanceTaskCreateDto dto)
     {
-        var task = new MaintenanceTask
-        {
-            TaskId = dto.TaskId,
-            AircraftId = dto.AircraftId,
-            Description = dto.Description,
-            Priority = dto.Priority,
-            ScheduledDate = dto.ScheduledDate, 
-            IsEmergency = dto.IsEmergency,
-            Status = dto.Status // Maps initial status from your DTO
-        };
-
+        var task = _mapper.Map<MaintenanceTask>(dto);
         var res = await _service.CreateAsync(task);
-        if (res == null) return Conflict($"Task {dto.TaskId} already exists or Aircraft ID is invalid.");
+        if (res == null) return Conflict($"Task {dto.TaskId} already exists.");
         
         return CreatedAtAction(nameof(Get), new { id = task.TaskId }, res);
     }
@@ -53,17 +46,7 @@ public class MaintenanceController : ControllerBase
     [Authorize(Policy = "MaintenanceWrite")]
     public async Task<IActionResult> Update(string id, [FromBody] MaintenanceTaskCreateDto dto)
     {
-        // Mapping DTO to Entity for the update logic
-        var taskUpdate = new MaintenanceTask
-        {
-            AircraftId = dto.AircraftId,
-            Description = dto.Description,
-            Priority = dto.Priority,
-            ScheduledDate = dto.ScheduledDate,
-            IsEmergency = dto.IsEmergency,
-            Status = dto.Status // FIXED: Explicitly mapping Status so "In-Progress" saves
-        };
-
+        var taskUpdate = _mapper.Map<MaintenanceTask>(dto);
         var success = await _service.UpdateAsync(id, taskUpdate);
         return success ? NoContent() : NotFound();
     }
@@ -77,13 +60,13 @@ public class MaintenanceController : ControllerBase
         return CreatedAtAction(nameof(Get), new { id = t.TaskId }, t);
     }
 
-    [HttpPut("tasks/{id}/complete")] // Change from HttpPost to HttpPut
-[Authorize(Policy = "MaintenanceTransition")]
-public async Task<IActionResult> Complete(string id)
-{
-    var success = await _service.CompleteTaskAsync(id);
-    return success ? NoContent() : NotFound();
-}
+    [HttpPut("tasks/{id}/complete")]
+    [Authorize(Policy = "MaintenanceTransition")]
+    public async Task<IActionResult> Complete(string id)
+    {
+        var success = await _service.CompleteTaskAsync(id);
+        return success ? NoContent() : NotFound();
+    }
 
     [HttpDelete("tasks/{id}")]
     [Authorize(Policy = "AdminOnly")]

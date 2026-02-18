@@ -5,6 +5,7 @@ using AeroTrack.Api.Domain.Entities;
 using AeroTrack.Api.Services;
 using AeroTrack.Api.Core.DTOs;
 using AeroTrack.Api.Infrastructure;
+using AutoMapper;
 
 namespace AeroTrack.Api.Controllers;
 
@@ -15,36 +16,35 @@ public class AircraftController : ControllerBase
 {
     private readonly IAircraftService _service;
     private readonly AppDbContext _db;
+    private readonly IMapper _mapper;
 
-    public AircraftController(IAircraftService service, AppDbContext db)
+    public AircraftController(IAircraftService service, AppDbContext db, IMapper mapper)
     {
         _service = service;
         _db = db;
+        _mapper = mapper;
     }
 
     [HttpGet]
-    [HttpGet]
-public async Task<IActionResult> List()
-{
-    // Explicitly include the history to avoid empty dates in the UI
-    var list = await _db.Aircraft
-        .Include(a => a.ServiceHistory) 
-        .AsNoTracking()
-        .ToListAsync();
+    public async Task<IActionResult> List()
+    {
+        var list = await _db.Aircraft
+            .Include(a => a.ServiceHistory) 
+            .AsNoTracking()
+            .ToListAsync();
 
-    var result = list.Select(a => new {
-        a.AircraftId,
-        a.Model,
-        a.Category,
-        a.ComplianceStatus,
-        // FIX: Cast to DateOnly? so the expression can return null if no history exists
-        lastServiceDate = a.ServiceHistory != null && a.ServiceHistory.Any()
-            ? (DateOnly?)a.ServiceHistory.Max(x => x.Date) 
-            : (DateOnly?)null
-    });
+        var result = list.Select(a => new {
+            a.AircraftId,
+            a.Model,
+            a.Category,
+            a.ComplianceStatus,
+            lastServiceDate = a.ServiceHistory != null && a.ServiceHistory.Any()
+                ? (DateOnly?)a.ServiceHistory.Max(x => x.Date) 
+                : (DateOnly?)null
+        });
 
-    return Ok(result);
-}
+        return Ok(result);
+    }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> Get(string id)
@@ -57,15 +57,9 @@ public async Task<IActionResult> List()
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] AircraftCreateDto dto)
     {
-        var aircraft = new Aircraft
-        {
-            AircraftId = dto.AircraftId,
-            Model = dto.Model,
-            Category = dto.Category,
-            ComplianceStatus = "Pending" // Required to prevent SQL null errors
-        };
-
+        var aircraft = _mapper.Map<Aircraft>(dto);
         var success = await _service.CreateAsync(aircraft);
+        
         if (!success) return Conflict($"Aircraft {dto.AircraftId} already exists.");
 
         return CreatedAtAction(nameof(Get), new { id = aircraft.AircraftId }, aircraft);
@@ -75,12 +69,7 @@ public async Task<IActionResult> List()
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(string id, [FromBody] AircraftCreateDto dto)
     {
-        var patch = new Aircraft
-        {
-            Model = dto.Model,
-            Category = dto.Category
-        };
-
+        var patch = _mapper.Map<Aircraft>(dto);
         var success = await _service.UpdateAsync(id, patch);
         return success ? NoContent() : NotFound();
     }

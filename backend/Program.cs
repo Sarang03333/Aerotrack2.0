@@ -93,7 +93,8 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("ComplianceWrite", p => p.RequireRole("Admin", "ComplianceOfficer"));
     options.AddPolicy("AnyRole", p => p.RequireRole("Admin", "Maintenance", "InventoryManager", "ComplianceOfficer"));
 });
- 
+ // This handles the registration automatically for all your controllers
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 // We use AddScoped because DbContext is Scoped (created per request)
 builder.Services.AddScoped<IAircraftService, AircraftService>();
 builder.Services.AddScoped<IUserService, DbUserService>();

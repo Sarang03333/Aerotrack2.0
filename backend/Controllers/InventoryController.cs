@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using AeroTrack.Api.Domain.Entities;
 using AeroTrack.Api.Services;
-using AeroTrack.Api.Core.DTOs; // Required for DTO access
+using AeroTrack.Api.Core.DTOs;
+using AutoMapper;
 
 namespace AeroTrack.Api.Controllers;
 
@@ -12,8 +13,13 @@ namespace AeroTrack.Api.Controllers;
 public class InventoryController : ControllerBase 
 {
     private readonly IInventoryService _service;
+    private readonly IMapper _mapper;
     
-    public InventoryController(IInventoryService s) => _service = s;
+    public InventoryController(IInventoryService s, IMapper mapper) 
+    {
+        _service = s;
+        _mapper = mapper;
+    }
 
     [HttpGet("parts")] 
     public async Task<IActionResult> List() => Ok(await _service.GetAllAsync());
@@ -22,16 +28,8 @@ public class InventoryController : ControllerBase
     [Authorize(Policy = "InventoryWrite")]
     public async Task<IActionResult> Create([FromBody] SparePartCreateDto dto) 
     {
-        // Manual mapping from DTO to Entity to fix DateOnly conversion and ID handling
-        var part = new SparePart 
-        {
-            PartId = dto.PartId,
-            Name = dto.Name,
-            QuantityAvailable = dto.QuantityAvailable,
-            ReorderLevel = dto.ReorderLevel,
-            // FIX CS0029: Convert current DateTime to DateOnly for the entity
-            LastUpdated = DateOnly.FromDateTime(DateTime.Now)
-        };
+        var part = _mapper.Map<SparePart>(dto);
+        part.LastUpdated = DateOnly.FromDateTime(DateTime.Now);
 
         var res = await _service.CreateAsync(part);
         return res == null ? Conflict($"Part ID {dto.PartId} already exists.") : CreatedAtAction(nameof(List), new { id = part.PartId }, res);
@@ -41,34 +39,25 @@ public class InventoryController : ControllerBase
     [Authorize(Policy = "InventoryWrite")]
     public async Task<IActionResult> Update(string id, [FromBody] SparePartCreateDto dto) 
     {
-        var partPatch = new SparePart 
-        {
-            Name = dto.Name,
-            QuantityAvailable = dto.QuantityAvailable,
-            ReorderLevel = dto.ReorderLevel,
-            LastUpdated = DateOnly.FromDateTime(DateTime.Now)
-        };
+        var partPatch = _mapper.Map<SparePart>(dto);
+        partPatch.LastUpdated = DateOnly.FromDateTime(DateTime.Now);
 
         return await _service.UpdateAsync(id, partPatch) ? NoContent() : NotFound();
     }
+
     [HttpGet("parts/{id}")]
-public async Task<IActionResult> Get(string id)
-{
-    // You must also add 'GetByIdAsync' to your IInventoryService and its implementation
-    var part = await _service.GetByIdAsync(id);
-    return part == null ? NotFound() : Ok(part);
-}
+    public async Task<IActionResult> Get(string id)
+    {
+        var part = await _service.GetByIdAsync(id);
+        return part == null ? NotFound() : Ok(part);
+    }
 
-[HttpPut("parts/{id}/replenish")]
-public async Task<IActionResult> Replenish(string id)
-{
-    // FIX: Use _service instead of _context
-    var success = await _service.ReplenishAsync(id);
-    
-    if (!success) return NotFound($"Part ID {id} not found.");
-
-    return NoContent();
-}
+    [HttpPut("parts/{id}/replenish")]
+    public async Task<IActionResult> Replenish(string id)
+    {
+        var success = await _service.ReplenishAsync(id);
+        return success ? NoContent() : NotFound($"Part ID {id} not found.");
+    }
 
     [HttpDelete("parts/{id}")] 
     [Authorize(Policy = "InventoryWrite")]
