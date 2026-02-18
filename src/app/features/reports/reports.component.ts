@@ -1,14 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-
-interface ReportStats {
-  totalDowntime: number;
-  totalCost: number;
-  safetyScore: number;
-  totalAircraft: number;
-  totalTasks: number;
-}
+import { ReportsService, ReportStats } from '../../core/services/reports.service';
 
 @Component({
   selector: 'app-reports',
@@ -16,38 +8,55 @@ interface ReportStats {
   imports: [CommonModule],
   templateUrl: './reports.component.html',
   styles: [`
+    /* Wrapper to kill white space and match theme */
+    :host {
+      display: block;
+      background: #0f172a; 
+      min-height: 100vh;
+      margin: -24px; /* Counteracts standard page padding */
+      padding: 24px;
+    }
+
+    .dashboard-container { 
+      width: 100%; 
+      max-width: 100%; /* Ensures full-width span */
+    }
+
     .stat-card {
-      background: rgba(30, 41, 59, 0.5); /* Semi-transparent slate */
-      border: 1px solid #334155;
-      border-radius: 12px;
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
       padding: 1.5rem;
     }
-    .report-action-card {
+
+    .report-card {
       background: #1e293b;
       border: 1px solid #334155;
-      border-radius: 12px;
-      transition: all 0.2s;
+      border-radius: 16px;
     }
-    .report-action-card:hover {
-      border-color: #3b82f6;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+
+    .text-gradient {
+      background: linear-gradient(to right, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
   `]
 })
 export class ReportsComponent implements OnInit {
   stats: ReportStats | null = null;
   isGenerating = false;
-  private apiUrl = 'http://localhost:5000/api';
 
-  constructor(private http: HttpClient) {}
+  // Injecting the new ReportsService
+  constructor(private reportsService: ReportsService) {}
 
   ngOnInit() {
     this.fetchOverview();
   }
 
   fetchOverview() {
-    this.http.get<ReportStats>(`${this.apiUrl}/reports/overview`).subscribe({
+    // Calling the service instead of direct HttpClient
+    this.reportsService.getOverview().subscribe({
       next: (data) => this.stats = data,
       error: (err) => console.error('Error fetching report stats:', err)
     });
@@ -55,12 +64,12 @@ export class ReportsComponent implements OnInit {
 
   downloadCsv() {
     this.isGenerating = true;
-    this.http.get(`${this.apiUrl}/reports/fleet-summary`, { responseType: 'blob' }).subscribe({
+    this.reportsService.downloadFleetReport().subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `AeroTrack_Combined_Report_${new Date().toISOString().slice(0,10)}.csv`;
+        a.download = `AeroTrack_Report_${new Date().toISOString().slice(0,10)}.csv`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
