@@ -55,14 +55,12 @@ export class AircraftDashboardComponent implements OnInit {
           // 2. Compliance Count
           const s = a.complianceStatus || 'Pending';
           compMap.set(s, (compMap.get(s) || 0) + 1);
-
           // 3. Service History (Last Service Date)
           if (a.lastServiceDate) {
             const d = new Date(a.lastServiceDate);
             if (!isNaN(d.getMonth())) months[d.getMonth()]++;
           }
         });
-
         // Update Charts
         this.categoryData = {
           labels: Array.from(catMap.keys()),

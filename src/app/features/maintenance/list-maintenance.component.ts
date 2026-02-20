@@ -18,14 +18,11 @@ export class ListMaintenanceComponent implements OnInit {
   tasks$!: Observable<any[]>;
   hasEmergency$!: Observable<boolean>;
 
-  // FIX: Ensure 'private' is used so 'this.maintenanceService' becomes a class property
   constructor(private maintenanceService: MaintenanceService) {}
 
   ngOnInit() {
-    this.refresh(); // Now this will work because the method is defined below
+    this.refresh(); 
   }
-
-  // FIX: Explicitly define the refresh method
   refresh() {
     this.tasks$ = this.maintenanceService.getTasks();
     this.hasEmergency$ = this.tasks$.pipe(

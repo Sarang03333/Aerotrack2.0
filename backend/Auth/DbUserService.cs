@@ -19,12 +19,10 @@ public class DbUserService : IUserService
         var normalizedUser = username.ToLower();
 
         // 2. Query the Database
-        // We look for a user where the stored username matches our input
         var user = await _db.Users
             .SingleOrDefaultAsync(u => u.Username.ToLower() == normalizedUser);
 
         // 3. Check Password 
-        // (Note: In production, verify hash here: BCrypt.Verify(password, user.PasswordHash))
         if (user != null && user.Password == password)
         {
             return new AuthUser

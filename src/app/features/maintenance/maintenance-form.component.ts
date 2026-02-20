@@ -66,7 +66,7 @@ export class MaintenanceFormComponent implements OnInit {
 
     request$.subscribe({
       next: () => this.router.navigate(['/maintenance']),
-      error: (err: any) => { // FIXED: Added type (err: any) to resolve ts(7006)
+      error: (err: any) => { 
         if (err.status === 400 && err.error?.errors) {
           this.errorMessage = err.error.errors.TaskId ? err.error.errors.TaskId[0] : "Validation failed.";
         } else {

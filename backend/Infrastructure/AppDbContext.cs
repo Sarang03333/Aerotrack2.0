@@ -1,9 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using AeroTrack.Api.Domain.Entities;
-
 namespace AeroTrack.Api.Infrastructure;
-
-// Using primary constructor style as in your original file
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
     public DbSet<Aircraft> Aircraft => Set<Aircraft>();
@@ -11,10 +8,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<MaintenanceTask> MaintenanceTasks => Set<MaintenanceTask>();
     public DbSet<SparePart> SpareParts => Set<SparePart>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
-    
     // 1. Add the Users Table
     public DbSet<User> Users => Set<User>();
-
     protected override void OnModelCreating(ModelBuilder b)
     {
         // Primary Keys
@@ -35,10 +30,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 v => string.Join(",", v),
                 v => v.Split(',', StringSplitOptions.RemoveEmptyEntries));
 
-        // --------------------------------------------------------
         // RELATIONSHIPS
-        // --------------------------------------------------------
-
         b.Entity<MaintenanceTask>()
             .HasOne(t => t.Aircraft)
             .WithMany(a => a.Tasks)
@@ -70,9 +62,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .IsUnique()
             .HasFilter("[TaskId] IS NOT NULL");
 
-        // --------------------------------------------------------
         // 3. DATA SEEDING (Initial Users)
-        // --------------------------------------------------------
+   
         b.Entity<User>().HasData(
             new User 
             { 

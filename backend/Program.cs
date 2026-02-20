@@ -2,13 +2,11 @@ using AeroTrack.Api.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;   // <-- add this
+using Microsoft.OpenApi.Models;
 using System.Text;
 using AeroTrack.Api.Auth;
 using AeroTrack.Api.Services;
 using AeroTrack.Api.Infrastructure.Middleware;
-
-
 
 var builder = WebApplication.CreateBuilder(args);
  
@@ -17,7 +15,6 @@ var conn = builder.Configuration.GetConnectionString("Default");
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(conn));
  
 // Controllers (MVC)
-// Locate this line in your Program.cs
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -60,7 +57,6 @@ builder.Services.AddSwaggerGen(c =>
  
     c.AddSecurityDefinition("Bearer", bearerScheme);
  
-    // Apply globally; Swagger will show the padlock button
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         [bearerScheme] = Array.Empty<string>()
@@ -93,7 +89,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("ComplianceWrite", p => p.RequireRole("Admin", "ComplianceOfficer"));
     options.AddPolicy("AnyRole", p => p.RequireRole("Admin", "Maintenance", "InventoryManager", "ComplianceOfficer"));
 });
- // This handles the registration automatically for all your controllers
+//This handles the registration automatically for all your controllers
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 // We use AddScoped because DbContext is Scoped (created per request)
 builder.Services.AddScoped<IAircraftService, AircraftService>();
@@ -110,17 +106,15 @@ Console.WriteLine($"ENV: {app.Environment.EnvironmentName}");
  
 app.UseCors("SpaDev");
 app.UseMiddleware<ExceptionMiddleware>();
- 
-// You can keep Swagger in all envs for now
+
 app.UseSwagger();
 app.UseSwaggerUI(o =>
 {
-    // Optional: ensure the endpoint is set when using c.SwaggerDoc above
     o.SwaggerEndpoint("/swagger/v1/swagger.json", "AeroTrack.Api v1");
     o.DisplayRequestDuration();
 });
  
-app.UseAuthentication();   // must be before UseAuthorization
+app.UseAuthentication();   
 app.UseAuthorization();
  
 app.MapControllers();
