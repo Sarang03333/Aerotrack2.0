@@ -23,7 +23,6 @@ export class DashboardComponent implements OnInit {
     nonCompliant: 0
   };
 
-  // --- 2. CHART OPTIONS (Dark Theme) ---
   public darkOptions: ChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -37,9 +36,6 @@ export class DashboardComponent implements OnInit {
     ...this.darkOptions,
     scales: { x: { display: false }, y: { display: false } }
   };
-
-  // --- 3. CHART DATA VARIABLES ---
-  
   // Aircraft Chart (Doughnut) - By Category
   aircraftData: ChartConfiguration<'doughnut'>['data'] = {
     labels: [], 
@@ -93,20 +89,16 @@ export class DashboardComponent implements OnInit {
 
       this.metrics.nonCompliant = non;
 
-      // Update Compliance Chart
       this.complianceData = {
         ...this.complianceData,
         datasets: [{ ...this.complianceData.datasets[0], data: [comp, pend, non] }]
       };
 
-      // Update Aircraft Category Chart
       this.aircraftData = {
         labels: Array.from(catMap.keys()),
         datasets: [{ ...this.aircraftData.datasets[0], data: Array.from(catMap.values()) }]
       };
     });
-
-    // B. FETCH MAINTENANCE (Populates Metrics, Maintenance Chart)
     this.http.get<any[]>(`${this.apiUrl}/maintenance/tasks`).subscribe(list => {
       let open = 0, closed = 0;
       const acMap = new Map<string, number>();
@@ -125,7 +117,6 @@ export class DashboardComponent implements OnInit {
       this.metrics.openTasks = open;
       this.metrics.completedTasks = closed;
 
-      // Top 5 Aircraft by Workload
       const topAc = Array.from(acMap.entries())
         .sort((a, b) => b[1] - a[1])
         .slice(0, 5);
@@ -136,9 +127,8 @@ export class DashboardComponent implements OnInit {
       };
     });
 
-    // C. FETCH INVENTORY (Populates Inventory Chart)
     this.http.get<any[]>(`${this.apiUrl}/inventory/parts`).subscribe(list => {
-      // Show top 6 parts by quantity
+
       const sorted = list.sort((a, b) => b.quantityAvailable - a.quantityAvailable).slice(0, 6);
 
       this.inventoryData = {

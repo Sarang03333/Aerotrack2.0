@@ -12,8 +12,6 @@ import { ReportsService, ReportStats } from '../../core/services/reports.service
       margin: -24px; padding: 24px;
     }
     .dashboard-container { width: 100%; max-width: 100%; }
-
-    /* bluish glass cards with extra padding for corner protection */
     .stat-card, .report-card {
       background: rgba(15, 23, 42, 0.6) !important;
       backdrop-filter: blur(20px) saturate(180%);
@@ -23,8 +21,6 @@ import { ReportsService, ReportStats } from '../../core/services/reports.service
       overflow: hidden;
       box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
     }
-
-    /* Small modifier for the top-aligned report card */
     .col-md-5 .report-card {
       padding: 1.25rem 1.5rem !important;
     }
@@ -50,7 +46,7 @@ export class ReportsComponent implements OnInit {
 
   ngOnInit() {
     this.fetchOverview();
-    this.fetchUpcoming(); // Load forecast on init
+    this.fetchUpcoming();
   }
 
   fetchOverview() {

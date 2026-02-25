@@ -13,6 +13,7 @@
             "outputPath": "dist/aerotrack",
             "index": "src/index.html",
             "main": "src/main.ts",
+            "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
@@ -26,7 +27,15 @@
             ],
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
-            ]
+            ],
+            "optimization": {
+              "scripts": true,
+              "styles": {
+                "minify": false,
+                "inlineCritical": false
+              },
+              "fonts": true
+            }
           }
         },
         "serve": {

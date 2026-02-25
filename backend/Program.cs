@@ -63,7 +63,6 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
  
-// ===== AuthN / AuthZ =====
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

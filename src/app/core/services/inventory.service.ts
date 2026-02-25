@@ -4,12 +4,10 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class InventoryService {
-  // Matches the Controller route + 'parts' segment + Port 5001
   private apiUrl = 'https://localhost:5001/api/Inventory/parts';
 
   constructor(private http: HttpClient) { }
 
-  // Fetches the full list (used for parts-list page)
   getParts(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl);
   }
@@ -30,7 +28,6 @@ export class InventoryService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
   replenishPart(id: string): Observable<any> {
-  // This calls the replenishment endpoint on your ASP.NET Core controller
-  return this.http.put<any>(`${this.apiUrl}/${id}/replenish`, {});
+    return this.http.put<any>(`${this.apiUrl}/${id}/replenish`, {});
 }
 }

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgIf } from '@angular/common';
-import { AircraftService } from '../../core/services/Aircraft.service'; // Use real service
+import { AircraftService } from '../../core/services/Aircraft.service';
 
 @Component({
   selector: 'app-aircraft-form',
@@ -13,7 +13,7 @@ import { AircraftService } from '../../core/services/Aircraft.service'; // Use r
 export class AircraftFormComponent implements OnInit {
   mode: 'new' | 'edit' = 'new';
   id: string | null = null;
-  errorMessage: string | null = null; // Hold backend DTO errors
+  errorMessage: string | null = null;
 
   form = this.fb.group({
     // Pattern matches the AC-XXX-000 convention
@@ -26,7 +26,7 @@ export class AircraftFormComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private aircraftService: AircraftService, // Inject live service
+    private aircraftService: AircraftService,
     private route: ActivatedRoute,
     private router: Router
   ) {}

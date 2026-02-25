@@ -6,7 +6,6 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ComplianceService {
-  // Use port 5001 to match your live backend
   private apiUrl = 'https://localhost:5001/api/compliance/audits';
 
   constructor(private http: HttpClient) { }

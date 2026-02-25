@@ -27,7 +27,6 @@ export class LoginComponent {
     private router: Router
   ) {}
 
-  // --- RESTORED: Quick Fill Feature ---
   quickFill(role: string, pass: string) {
     this.form.patchValue({
       username: role,

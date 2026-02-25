@@ -1,135 +1,107 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './core/auth/login.component';
-import { roleGuard } from './core/auth/role.guard'; // Ensure path is correct
-
-// Feature Components
-import { DashboardComponent } from './features/dashboard/dashboard.component';
-import { ListAircraftComponent } from './features/aircraft/list-aircraft.component';
-import { AircraftDashboardComponent } from './features/aircraft/aircraft-dashboard.component';
-import { AircraftFormComponent } from './features/aircraft/aircraft-form.component';
-import { ListMaintenanceComponent } from './features/maintenance/list-maintenance.component';
-import { MaintenanceDashboardComponent } from './features/maintenance/maintenance-dashboard.component';
-import { MaintenanceFormComponent } from './features/maintenance/maintenance-form.component';
-import { ListPartsComponent } from './features/inventory/list-parts.component';
-import { InventoryDashboardComponent } from './features/inventory/inventory-dashboard.component';
-import { PartFormComponent } from './features/inventory/part-form.component';
-import { AuditsComponent } from './features/compliance/audits.component';
-import { ComplianceDashboardComponent } from './features/compliance/compliance-dashboard.component';
-import { AuditFormComponent } from './features/compliance/audit-form.component';
-import { ReportsComponent } from './features/reports/reports.component';
-
-
-
+import { roleGuard } from './core/auth/role.guard';
 
 export const routes: Routes = [
-  // 1. Default -> Login
+  // 1. Default -> Login (Eagerly Loaded)
   { path: '', pathMatch: 'full', redirectTo: 'login' },
-  
-  // 2. Public Login
+
   { path: 'login', component: LoginComponent },
 
-  // 3. Protected Dashboard (Any authenticated role)
   { 
     path: 'dashboard', 
-    component: DashboardComponent,
+    loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
     canActivate: [roleGuard(['Maintenance', 'InventoryManager', 'ComplianceOfficer'])] 
   },
 
-  // --- AIRCRAFT (Admin or Maintenance) ---
   { 
     path: 'aircraft', 
-    component: ListAircraftComponent,
+    loadComponent: () => import('./features/aircraft/list-aircraft.component').then(m => m.ListAircraftComponent),
     canActivate: [roleGuard(['Maintenance'])]
   },
   { 
     path: 'aircraft/dashboard', 
-    component: AircraftDashboardComponent,
+    loadComponent: () => import('./features/aircraft/aircraft-dashboard.component').then(m => m.AircraftDashboardComponent),
     canActivate: [roleGuard(['Maintenance'])]
   },
   { 
     path: 'aircraft/new', 
-    component: AircraftFormComponent,
+    loadComponent: () => import('./features/aircraft/aircraft-form.component').then(m => m.AircraftFormComponent),
     canActivate: [roleGuard(['Maintenance'])]
   },
   { 
     path: 'aircraft/edit/:id', 
-    component: AircraftFormComponent,
+    loadComponent: () => import('./features/aircraft/aircraft-form.component').then(m => m.AircraftFormComponent),
     canActivate: [roleGuard(['Maintenance'])]
   },
 
-  // --- MAINTENANCE (Admin or Maintenance) ---
   { 
     path: 'maintenance', 
-    component: ListMaintenanceComponent,
+    loadComponent: () => import('./features/maintenance/list-maintenance.component').then(m => m.ListMaintenanceComponent),
     canActivate: [roleGuard(['Maintenance'])]
   },
   { 
     path: 'maintenance/dashboard', 
-    component: MaintenanceDashboardComponent,
+    loadComponent: () => import('./features/maintenance/maintenance-dashboard.component').then(m => m.MaintenanceDashboardComponent),
     canActivate: [roleGuard(['Maintenance'])]
   },
   { 
     path: 'maintenance/new', 
-    component: MaintenanceFormComponent,
+    loadComponent: () => import('./features/maintenance/maintenance-form.component').then(m => m.MaintenanceFormComponent),
     canActivate: [roleGuard(['Maintenance'])]
   },
   { 
     path: 'maintenance/edit/:id', 
-    component: MaintenanceFormComponent,
+    loadComponent: () => import('./features/maintenance/maintenance-form.component').then(m => m.MaintenanceFormComponent),
     canActivate: [roleGuard(['Maintenance'])]
   },
-
-  // --- INVENTORY (Admin or InventoryManager) ---
   { 
     path: 'inventory', 
-    component: ListPartsComponent,
+    loadComponent: () => import('./features/inventory/list-parts.component').then(m => m.ListPartsComponent),
     canActivate: [roleGuard(['InventoryManager'])]
   },
   { 
     path: 'inventory/dashboard', 
-    component: InventoryDashboardComponent,
+    loadComponent: () => import('./features/inventory/inventory-dashboard.component').then(m => m.InventoryDashboardComponent),
     canActivate: [roleGuard(['InventoryManager'])]
   },
   { 
     path: 'inventory/new', 
-    component: PartFormComponent,
+    loadComponent: () => import('./features/inventory/part-form.component').then(m => m.PartFormComponent),
     canActivate: [roleGuard(['InventoryManager'])]
   },
   { 
     path: 'inventory/edit/:id', 
-    component: PartFormComponent,
+    loadComponent: () => import('./features/inventory/part-form.component').then(m => m.PartFormComponent),
     canActivate: [roleGuard(['InventoryManager'])]
   },
 
-  // --- COMPLIANCE (Admin or ComplianceOfficer) ---
   { 
     path: 'compliance', 
-    component: AuditsComponent,
+    loadComponent: () => import('./features/compliance/audits.component').then(m => m.AuditsComponent),
     canActivate: [roleGuard(['ComplianceOfficer'])]
   },
   { 
     path: 'compliance/dashboard', 
-    component: ComplianceDashboardComponent,
+    loadComponent: () => import('./features/compliance/compliance-dashboard.component').then(m => m.ComplianceDashboardComponent),
     canActivate: [roleGuard(['ComplianceOfficer'])]
   },
   { 
     path: 'compliance/new', 
-    component: AuditFormComponent,
+    loadComponent: () => import('./features/compliance/audit-form.component').then(m => m.AuditFormComponent),
     canActivate: [roleGuard(['ComplianceOfficer'])]
   },
   { 
     path: 'compliance/edit/:id', 
-    component: AuditFormComponent,
+    loadComponent: () => import('./features/compliance/audit-form.component').then(m => m.AuditFormComponent),
     canActivate: [roleGuard(['ComplianceOfficer'])]
   },
 
-  // --- REPORTS ---
   { 
-        path: 'reports', 
-        component:ReportsComponent,
-        canActivate: [roleGuard(['Admin', 'Maintenance', 'ComplianceOfficer','InventoryManager'])],
-        data: { roles: ['Admin', 'Maintenance', 'ComplianceOfficer','InventoryManager'] } 
-    },
+    path: 'reports', 
+    loadComponent: () => import('./features/reports/reports.component').then(m => m.ReportsComponent),
+    canActivate: [roleGuard(['Admin', 'Maintenance', 'ComplianceOfficer','InventoryManager'])]
+  },
 
   // Fallback
   { path: '**', redirectTo: 'dashboard' }

@@ -29,7 +29,7 @@ export class ListAircraftComponent implements OnInit {
   remove(id: string) {
     if (confirm('Are you sure you want to delete this aircraft?')) {
       this.aircraftService.deleteAircraft(id).subscribe({
-        next: () => this.refresh(), // UI re-renders immediately
+        next: () => this.refresh(),
         error: (err) => console.error("Delete failed", err)
       });
     }

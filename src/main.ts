@@ -16,11 +16,8 @@ bootstrapApplication(AppComponent, {
     provideRouter(routes, withComponentInputBinding()),
     provideAnimations(),
     provideCharts(withDefaultRegisterables()),
-
-    // FIX: You must add withInterceptorsFromDi() here!
     provideHttpClient(withInterceptorsFromDi()), 
 
-    // Now this provider will actually work
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
   ]
 }).catch(err => console.error(err));
